@@ -1,0 +1,2 @@
+ALTER TABLE "university" RENAME COLUMN "universityCode" TO "universityAbbreviation";--> statement-breakpoint
+ALTER TABLE "university" ADD CONSTRAINT "university_universityAbbreviation_unique" UNIQUE("universityAbbreviation");

@@ -1,0 +1,2 @@
+CREATE TYPE "public"."legacy_ring_level" AS ENUM('ring_one_builder', 'ring_two_advocate', 'ring_three_leader', 'ring_four_visionary', 'ring_five_legacy');--> statement-breakpoint
+ALTER TABLE "user_universities" ADD COLUMN "ringLevel" "legacy_ring_level";

@@ -1,0 +1,132 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1737124696524,
+      "tag": "0000_wild_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1749150061560,
+      "tag": "0001_add-record-id-to-tables-history",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749830808755,
+      "tag": "0002_modify_the_webhooks_table_and_add_webhook_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751918746953,
+      "tag": "0003_change_the_name_of_platform_to_name_in_the_webhooks",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751919206709,
+      "tag": "0004_add_the_event_types_array_to_the_webhooks_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1751921819470,
+      "tag": "0005_update_createdat_field_to_timestamptz_default_utc",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753214300406,
+      "tag": "0006_add_the_global_feature_flag_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758837429033,
+      "tag": "0007_add_model_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1759273158889,
+      "tag": "0008_rename-workspace-to-university",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1759354995705,
+      "tag": "0009_add_the_giving_opportunities_model",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1759443057039,
+      "tag": "0010_added new properties to the university and giving opportunities",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1759527794312,
+      "tag": "0011_rename-the-university-code-for-university-abbreviation",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1760050690205,
+      "tag": "0012_add-the-new-user-profile-model",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1760129562182,
+      "tag": "0013_added-the-alumni-role-and-removed-the-member-role",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1760563439754,
+      "tag": "0014_create-the-pledge-opportunities-model",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1760928480535,
+      "tag": "0015_add-the-missing-optional-fields-to-the-user-profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1760996787741,
+      "tag": "0016_add-the-reference-code-to-the-pledge-opportunities-template",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1761138738355,
+      "tag": "0017_add-the-new-risk-level-field-to-user-universities",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+ALTER TABLE "pledge_opportunities" ADD COLUMN "referenceCode" varchar(50) NOT NULL;--> statement-breakpoint
+ALTER TABLE "pledge_opportunities" ADD CONSTRAINT "pledge_opportunities_referenceCode_unique" UNIQUE("referenceCode");
