@@ -5,33 +5,55 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
-import { useGetRecord } from '@/client-common/sdk';
+import { useGetFile, useGetRecord } from '@/client-common/sdk';
+import type { LegacyRingLevelEnum } from '@/common-types/index';
 import { AlgoliaTable, AlgoliaTableWrapper } from '@/components/algolia-table';
 import { UserUniversityDetails } from '@/components/user-universities/details';
-import type { DbUserUniversities } from '@/db/schema';
+import { RingIndicator } from '@/components/user-universities/ring-indicator';
+import type { DbUser, DbUserUniversities } from '@/db/schema';
 import { Button } from '@/theme/index';
 import type { NextPageWithLayout } from '@/types/next';
 import { AlgoliaTableColumnHeader } from '@/ui/algolia-table/algolia-column-header';
+import { UserAvatar } from '@/ui/index';
 import { getLocalizedLegacyRingLevel } from '@/utils/localization';
 
-const UserUniversitiesCell: FC<{ userId: string }> = ({ userId }) => {
-  const { data } = useGetRecord('users', userId);
+const UserInfoCell: FC<{
+  userId: string;
+  ringLevel: LegacyRingLevelEnum | null;
+}> = ({ userId, ringLevel }) => {
+  const { data: dataUser } = useGetRecord('users', userId) as { data: DbUser };
 
-  if (data && typeof data === 'object' && 'name' in data) {
-    return <span>{(data as { name: string }).name}</span>;
-  }
+  const profileImageKey = dataUser?.profileImage ?? '';
+  const { data: profileImageData } = useGetFile(
+    { id: profileImageKey },
+    { enabled: !!profileImageKey }
+  );
 
-  return <span>{userId.substring(0, 8)}...</span>;
-};
+  const profileImageUrl = profileImageData?.url || null;
 
-const UserEmailCell: FC<{ userId: string }> = ({ userId }) => {
-  const { data } = useGetRecord('users', userId);
+  const userName =
+    dataUser && typeof dataUser === 'object' && 'name' in dataUser
+      ? (dataUser as { name: string }).name
+      : `${userId.substring(0, 8)}...`;
 
-  if (data && typeof data === 'object' && 'email' in data) {
-    return <span>{(data as { email: string }).email}</span>;
-  }
+  return (
+    <div className="flex flex-col items-start gap-2">
+      {dataUser && (
+        <UserAvatar
+          user={{
+            name: dataUser.name,
+            image: profileImageUrl,
+          }}
+          className="size-12"
+        />
+      )}
 
-  return <span>-</span>;
+      <div className="flex items-center gap-2">
+        <span>{userName}</span>
+        <RingIndicator ringLevel={ringLevel} />
+      </div>
+    </div>
+  );
 };
 
 const UniversityNameCell: FC<{ universityId: string }> = ({ universityId }) => {
@@ -57,35 +79,28 @@ const useColumns = ({ handleRowClick }: UseColumnsProps) => {
   return useMemo(
     () => [
       columnsHelper.accessor('userId', {
-        id: 'userUniversities-userName',
+        id: 'userUniversities-userInfo',
         header: ({ column }) => (
-          <AlgoliaTableColumnHeader column={column} title={t('Name')} />
+          <AlgoliaTableColumnHeader column={column} title={t('User')} />
         ),
         cell: ({ row }) => {
-          const { userId } = row.original;
+          const { userId, ringLevel } = row.original;
+
           return (
             <Button
               onClick={() => handleRowClick(row.original)}
               variant="unstyled"
+              className="py-9"
             >
-              <UserUniversitiesCell userId={userId} />
+              <UserInfoCell
+                userId={userId}
+                ringLevel={ringLevel as LegacyRingLevelEnum}
+              />
             </Button>
           );
         },
         enableHiding: true,
       }),
-      columnsHelper.accessor('userId', {
-        id: 'userUniversities-userEmail',
-        header: ({ column }) => (
-          <AlgoliaTableColumnHeader column={column} title={t('Email')} />
-        ),
-        cell: ({ row }) => {
-          const { userId } = row.original;
-          return <UserEmailCell userId={userId} />;
-        },
-        enableHiding: true,
-      }),
-
       columnsHelper.accessor('universityId', {
         id: 'userUniversities-universityName',
         header: ({ column }) => (
@@ -102,9 +117,19 @@ const useColumns = ({ handleRowClick }: UseColumnsProps) => {
           <AlgoliaTableColumnHeader column={column} title={t('Legacy Ring')} />
         ),
         cell: ({ row }) => {
-          return row.original.ringLevel
-            ? getLocalizedLegacyRingLevel(t, row.original.ringLevel)
-            : t('Not defined');
+          return row.original.ringLevel ? (
+            <div className="flex items-center gap-2">
+              <span>
+                {getLocalizedLegacyRingLevel(t, row.original.ringLevel)}
+              </span>
+
+              <RingIndicator
+                ringLevel={row.original.ringLevel as LegacyRingLevelEnum}
+              />
+            </div>
+          ) : (
+            <span>{t('Not defined')}</span>
+          );
         },
         enableHiding: true,
       }),

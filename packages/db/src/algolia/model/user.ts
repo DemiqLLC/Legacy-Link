@@ -42,6 +42,7 @@ export const user = algoliaModel({
     active: true,
     createdAt: { canSort: true },
     isSuperAdmin: true,
+    profileImage: true,
   },
   includeRelations: {
     universities: userUniversityRelation,

@@ -79,7 +79,6 @@ export const modelsConfig: ModelConfig = {
       { label: 'ID', type: 'ID', key: 'id' },
       { label: <Trans>Name</Trans>, type: 'text', key: 'name' },
       { label: <Trans>E-mail</Trans>, type: 'email', key: 'email' },
-      { label: <Trans>Active</Trans>, type: 'boolean', key: 'active' },
       {
         label: <Trans>Super Admin</Trans>,
         type: 'boolean',
@@ -96,7 +95,6 @@ export const modelsConfig: ModelConfig = {
     schema: userAdminModelSchema.pick({
       name: true,
       email: true,
-      active: true,
       password: true,
       isSuperAdmin: true,
       universities: true,
@@ -176,9 +174,11 @@ export const modelsConfig: ModelConfig = {
         key: 'universityId',
         relationModel: 'university',
       },
+      { label: <Trans>Is it active?</Trans>, type: 'boolean', key: 'isActive' },
     ],
     schema: givingOpportunitiesAdminModelSchema.pick({
       name: true,
+      isActive: true,
       goalAmount: true,
       description: true,
       universityId: true,
@@ -315,6 +315,11 @@ export const modelsConfig: ModelConfig = {
           },
         ],
       },
+      {
+        label: <Trans>Reference Code</Trans>,
+        type: 'text',
+        key: 'referenceCode',
+      },
     ],
     schema: selectPledgeOpportunitiesSchema.pick({
       userId: true,
@@ -324,6 +329,7 @@ export const modelsConfig: ModelConfig = {
       status: true,
       pledgeType: true,
       preferredCommunicationMethod: true,
+      referenceCode: true,
     }),
     isExportable: true,
   },

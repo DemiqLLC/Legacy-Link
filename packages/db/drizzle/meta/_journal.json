@@ -127,6 +127,13 @@
       "when": 1761138738355,
       "tag": "0017_add-the-new-risk-level-field-to-user-universities",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1761579703882,
+      "tag": "0018_add-the-isActive-property-to-the-GivingOpportunities-model",
+      "breakpoints": true
     }
   ]
 }

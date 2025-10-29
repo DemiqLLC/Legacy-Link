@@ -1,0 +1,1 @@
+ALTER TABLE "giving_opportunities" ADD COLUMN "isActive" boolean DEFAULT true NOT NULL;

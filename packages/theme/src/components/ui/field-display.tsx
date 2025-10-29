@@ -1,6 +1,9 @@
+import type { ReactNode } from 'react';
+import React from 'react';
+
 type FieldDisplayProps = {
   label: string;
-  value?: string | number;
+  value?: string | number | ReactNode;
 };
 
 export const FieldDisplay: React.FC<FieldDisplayProps> = ({ label, value }) => {
@@ -13,7 +16,11 @@ export const FieldDisplay: React.FC<FieldDisplayProps> = ({ label, value }) => {
         className={`text-sm text-gray-900 dark:text-white ${
           label === 'Description' ? 'max-w-full truncate' : ''
         }`}
-        title={value?.toString()}
+        title={
+          typeof value === 'string' || typeof value === 'number'
+            ? value.toString()
+            : undefined
+        }
       >
         {value || '-'}
       </div>

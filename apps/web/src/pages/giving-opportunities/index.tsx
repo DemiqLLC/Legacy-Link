@@ -152,6 +152,7 @@ const GivingOpportunitiesPageContent: FC = () => {
           columns={columns}
           withSearch
           withPagination
+          filters={`isActive:${true}`}
           searchPlaceholder={t('Search By Name')}
           hasViewOptions
         />

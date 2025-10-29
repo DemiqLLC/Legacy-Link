@@ -486,6 +486,8 @@ export const BasicDataForm: React.FC<BasicDataFormProps> = ({
           );
         });
         await new Promise<void>((resolve, reject) => {
+          const emptyToNull = (value?: string | null): string | null =>
+            value || null;
           updateUserProfile(
             {
               graduationYear: values.graduationYear,
@@ -501,19 +503,19 @@ export const BasicDataForm: React.FC<BasicDataFormProps> = ({
               cityState: values.cityState,
               country: values.country,
               hometownAtEnrollment: values.hometownAtEnrollment,
-              genderIdentity: values.genderIdentity,
+              genderIdentity: emptyToNull(values.genderIdentity),
               racialEthnicBackground: values.racialEthnicBackground,
               firstGenerationGraduate: values.firstGenerationGraduate,
-              relationshipStatus: values.relationshipStatus,
+              relationshipStatus: emptyToNull(values.relationshipStatus),
               dependentsInCollege: values.dependentsInCollege,
               employmentStatus: values.employmentStatus,
               industry: values.industry,
               occupation: values.occupation || '',
               employer: values.employer || '',
-              incomeRange: values.incomeRange || '',
+              incomeRange: emptyToNull(values.incomeRange),
               educationGivingPercentage: values.educationGivingPercentage,
               hasCurrentContributions: values.hasCurrentContributions,
-              interestedInFund: values.interestedInFund || '',
+              interestedInFund: emptyToNull(values.interestedInFund),
               willingToMentor: values.willingToMentor,
               wantsAlumniConnections: values.wantsAlumniConnections,
               interestedInEvents: values.interestedInEvents,

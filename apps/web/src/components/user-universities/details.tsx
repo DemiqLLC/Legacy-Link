@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 
 import { useGetRecord, useGetUserProfileByUserId } from '@/client-common/sdk';
+import type { LegacyRingLevelEnum } from '@/common-types/index';
 import { useSessionUser } from '@/components/user/user-context';
 import type {
   DbUniversity,
@@ -27,6 +28,7 @@ import {
 } from '@/utils/localization';
 
 import { LegacyRingModal } from './legacy-ring-modal';
+import { RingIndicator } from './ring-indicator';
 
 type UserUniversityDetailsProps = {
   isOpen: boolean;
@@ -99,9 +101,23 @@ export const UserUniversityDetails: React.FC<UserUniversityDetailsProps> = ({
             <FieldDisplay
               label={t('Legacy Ring')}
               value={
-                userUniversities?.ringLevel
-                  ? getLocalizedLegacyRingLevel(t, userUniversities?.ringLevel)
-                  : t('Not defined')
+                userUniversities?.ringLevel ? (
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {getLocalizedLegacyRingLevel(
+                        t,
+                        userUniversities.ringLevel
+                      )}
+                    </span>
+                    <RingIndicator
+                      ringLevel={
+                        userUniversities.ringLevel as LegacyRingLevelEnum
+                      }
+                    />
+                  </div>
+                ) : (
+                  t('Not defined')
+                )
               }
             />
           </div>

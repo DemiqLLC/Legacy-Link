@@ -21,12 +21,14 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
 
+import type { LegacyRingLevelEnum } from '@/common-types/index';
 import { DeleteRecord } from '@/components/admin/delete-record';
 import { AlgoliaTable, AlgoliaTableWrapper } from '@/components/algolia-table';
 import { GivingOpportunityDetails } from '@/components/giving-opportunities/details';
 import { PledgeOpportunityDetails } from '@/components/pledge-opportunities/details';
 import { UniversityDetails } from '@/components/university/details';
 import { UserUniversityDetails } from '@/components/user-universities/details';
+import { RingIndicator } from '@/components/user-universities/ring-indicator';
 import { modelsConfig } from '@/config/super-admin';
 import type {
   DbGivingOpportunities,
@@ -88,19 +90,6 @@ const UserEmailCell: FC<{ userId: string }> = ({ userId }) => {
 
   if (data && typeof data === 'object' && 'email' in data) {
     return <span>{(data as { email: string }).email}</span>;
-  }
-
-  return <span>-</span>;
-};
-
-const UserActiveCell: FC<{ userId: string }> = ({ userId }) => {
-  const { data } = useGetRecord('users', userId);
-  const { t } = useTranslation();
-
-  if (data && typeof data === 'object' && 'active' in data) {
-    return (
-      <span>{(data as { active: boolean }).active ? t('Yes') : t('No')}</span>
-    );
   }
 
   return <span>-</span>;
@@ -250,16 +239,6 @@ const useColumns = ({
                 return <UserEmailCell userId={userId} />;
               },
             }),
-            columnHelper.accessor(field.key, {
-              id: `${modelName}-userActive`,
-              header: ({ column }) => (
-                <HeaderComponent column={column} title={t('Active')} />
-              ),
-              cell: (context) => {
-                const userId = context.getValue<string>();
-                return <UserActiveCell userId={userId} />;
-              },
-            }),
           ];
         }
 
@@ -275,7 +254,6 @@ const useColumns = ({
             },
           });
         }
-
         if (modelName === 'userUniversities' && field.key === 'ringLevel') {
           return columnHelper.accessor(field.key, {
             id: `${modelName}-ringLevel`,
@@ -284,9 +262,14 @@ const useColumns = ({
             ),
             cell: (context) => {
               const value = context.getValue<string | null>();
-              return value
-                ? getLocalizedLegacyRingLevel(t, value)
-                : t('Not defined');
+              return value ? (
+                <div className="flex items-center gap-2">
+                  <span>{getLocalizedLegacyRingLevel(t, value)}</span>
+                  <RingIndicator ringLevel={value as LegacyRingLevelEnum} />
+                </div>
+              ) : (
+                <span>{t('Not defined')}</span>
+              );
             },
           });
         }
@@ -379,7 +362,8 @@ const useColumns = ({
 
     if (
       modelName !== 'globalFeatureFlags' &&
-      modelName !== 'pledgeOpportunities'
+      modelName !== 'pledgeOpportunities' &&
+      modelName !== 'userUniversities'
     ) {
       baseColumns.push(
         columnHelper.accessor('id', {

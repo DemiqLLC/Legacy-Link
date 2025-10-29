@@ -25,6 +25,9 @@ export const givingOpportunitiesAlgolia = algoliaModel({
   config: {
     id: true,
     name: true,
+    isActive: {
+      canFilter: true,
+    },
     goalAmount: true,
     description: true,
     universityId: true,

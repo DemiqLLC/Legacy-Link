@@ -328,12 +328,14 @@ adminRouter.post('/:model', async (req, res) => {
       ) {
         const data = req.body.data as Record<string, unknown>;
 
-        const universityCode =
-          'universityCode' in data && typeof data.universityCode === 'string'
-            ? data.universityCode
+        const universityAbbreviation =
+          'universityAbbreviation' in data &&
+          typeof data.universityAbbreviation === 'string'
+            ? data.universityAbbreviation
             : 'XXX';
 
-        (data as DbUniversity).referenceCode = `LL-${universityCode}-001`;
+        (data as DbUniversity).referenceCode =
+          `LL-${universityAbbreviation}-001`;
         req.body.data = data;
       }
 

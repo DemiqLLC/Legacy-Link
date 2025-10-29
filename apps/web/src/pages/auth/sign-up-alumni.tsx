@@ -77,10 +77,29 @@ const SignUpPageAlumni: NextPageWithLayout = () => {
     cityState: z.string().min(1, t('City/State is required')),
     country: z.string().min(1, t('Country is required')),
     hometownAtEnrollment: z.string().optional(),
-    genderIdentity: z.string().optional(),
+    genderIdentity: z
+      .union([
+        z.enum(['male', 'female', 'non_binary', 'prefer_not_say', 'other']),
+        z.literal(''),
+        z.undefined(),
+      ])
+      .optional(),
     racialEthnicBackground: z.array(z.string()).optional(),
     firstGenerationGraduate: z.boolean().optional(),
-    relationshipStatus: z.string().optional(),
+    relationshipStatus: z
+      .union([
+        z.enum([
+          'single',
+          'married',
+          'domestic_partnership',
+          'divorced',
+          'widowed',
+          'prefer_not_say',
+        ]),
+        z.literal(''),
+        z.undefined(),
+      ])
+      .optional(),
     dependentsInCollege: z.boolean().optional(),
   });
 
@@ -89,10 +108,29 @@ const SignUpPageAlumni: NextPageWithLayout = () => {
     industry: z.string().min(1, t('Industry is required')),
     occupation: z.string().optional().or(z.literal('')),
     employer: z.string().optional().or(z.literal('')),
-    incomeRange: z.string().optional().or(z.literal('')),
+    incomeRange: z
+      .union([
+        z.enum([
+          'under_50k',
+          '50k_100k',
+          '100k_150k',
+          '150k_250k',
+          'over_250k',
+          'prefer_not_say',
+        ]),
+        z.literal(''),
+        z.undefined(),
+      ])
+      .optional(),
     educationGivingPercentage: z.coerce.number().optional(),
     hasCurrentContributions: z.boolean().optional(),
-    interestedInFund: z.string().optional().or(z.literal('')),
+    interestedInFund: z
+      .union([
+        z.enum(['yes', 'maybe', 'not_now']),
+        z.literal(''),
+        z.undefined(),
+      ])
+      .optional(),
   });
 
   const CommunityConnectionSchema = z.object({
@@ -143,7 +181,7 @@ const SignUpPageAlumni: NextPageWithLayout = () => {
   > => {
     const { step1, step2, step3, step4, step5, step6, step7 } = data;
     const emailValue = step1.email.trim().toLowerCase();
-
+    const emptyToNull = (value?: string | null): string | null => value || null;
     try {
       setIsCreating(true);
 
@@ -187,19 +225,19 @@ const SignUpPageAlumni: NextPageWithLayout = () => {
         cityState: step5.cityState,
         country: step5.country,
         hometownAtEnrollment: step5.hometownAtEnrollment ?? null,
-        genderIdentity: step5.genderIdentity ?? null,
+        genderIdentity: emptyToNull(step5.genderIdentity),
         racialEthnicBackground: step5.racialEthnicBackground ?? null,
         firstGenerationGraduate: step5.firstGenerationGraduate ?? null,
-        relationshipStatus: step5.relationshipStatus ?? null,
+        relationshipStatus: emptyToNull(step5.relationshipStatus),
         dependentsInCollege: step5.dependentsInCollege ?? null,
         employmentStatus: step6.employmentStatus,
         industry: step6.industry,
         occupation: step6.occupation ?? '',
         employer: step6.employer ?? null,
-        incomeRange: step6.incomeRange ?? null,
+        incomeRange: emptyToNull(step6.incomeRange),
         educationGivingPercentage: step6.educationGivingPercentage ?? null,
         hasCurrentContributions: step6.hasCurrentContributions ?? null,
-        interestedInFund: step6.interestedInFund ?? null,
+        interestedInFund: emptyToNull(step6.interestedInFund),
         willingToMentor: step7.willingToMentor ?? null,
         wantsAlumniConnections: step7.wantsAlumniConnections ?? null,
         interestedInEvents: step7.interestedInEvents ?? null,
