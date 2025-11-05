@@ -1,10 +1,14 @@
 /* eslint-disable class-methods-use-this */
 import type { LegacyRingLevelEnum, UserRoleEnum } from '@meltstudio/types';
-import { and, eq, inArray } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { and, eq, ilike, inArray, or, sql } from 'drizzle-orm';
 import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core';
 
 import type { DbUserUniversities } from '@/db/schema';
-import { userUniversities as userUniversitiesTable } from '@/db/schema';
+import {
+  users as usersTable,
+  userUniversities as userUniversitiesTable,
+} from '@/db/schema';
 import type { GetQueryRelations } from '@/db/utils';
 
 import type { ManyRelations } from './base';
@@ -161,5 +165,58 @@ export class DbUserUniversitiesModel extends DbModel<
           eq(userUniversitiesTable.universityId, universityId)
         )
       );
+  }
+
+  public async findAllUserUniversities(opts?: {
+    filters?: {
+      search?: string;
+      role?: string;
+    };
+    pagination?: { pageIndex?: number; pageSize?: number };
+  }): Promise<{ items: DbUserUniversities[]; total: number }> {
+    const conditions: (SQL | undefined)[] = [];
+
+    if (opts?.filters?.role) {
+      conditions.push(eq(this.dbTable.role, opts.filters.role));
+    }
+
+    if (opts?.filters?.search) {
+      const search = `%${opts.filters.search}%`;
+      conditions.push(
+        or(ilike(usersTable.name, search), ilike(usersTable.email, search))
+      );
+    }
+
+    const pageSize = opts?.pagination?.pageSize ?? 10;
+    const pageIndex = opts?.pagination?.pageIndex ?? 0;
+
+    const whereCondition =
+      conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [items, totalResult] = await Promise.all([
+      this.client
+        .select({
+          userId: this.dbTable.userId,
+          universityId: this.dbTable.universityId,
+          role: this.dbTable.role,
+          ringLevel: this.dbTable.ringLevel,
+        })
+        .from(this.dbTable)
+        .innerJoin(usersTable, eq(this.dbTable.userId, usersTable.id))
+        .where(whereCondition)
+        .limit(pageSize)
+        .offset(pageIndex * pageSize)
+        .execute(),
+      this.client
+        .select({ count: sql<number>`count(*)` })
+        .from(this.dbTable)
+        .innerJoin(usersTable, eq(this.dbTable.userId, usersTable.id))
+        .where(whereCondition)
+        .execute(),
+    ]);
+
+    const total = Number(totalResult[0]?.count ?? 0);
+
+    return { items: items as DbUserUniversities[], total };
   }
 }

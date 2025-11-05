@@ -38,19 +38,30 @@ import type {
 } from '@/db/schema';
 import { useModelByRoute } from '@/hooks/use-model-by-route';
 import type { NextPageWithLayout } from '@/types/next';
+import type { DataTableGlobalFilter } from '@/ui/data-table';
 import {
   getLocalizedLegacyRingLevel,
   getLocalizedPledgeStatus,
   getLocalizedPledgeType,
 } from '@/utils/localization';
 
-const searchParamsSchema = z.object({
+export const searchParamsSchema = z.object({
   pagination: z
     .object({
       pageIndex: z.number().int().nonnegative(),
       pageSize: z.number().int().positive(),
     })
     .catch({ pageIndex: 0, pageSize: 10 }),
+
+  search: z.string().optional().catch(undefined),
+  filters: z
+    .object({
+      search: z.string().optional(),
+      role: z.string().optional(),
+      isSuperAdmin: z.coerce.boolean().optional(),
+    })
+    .optional()
+    .catch(undefined),
 });
 
 const columnHelper = createColumnHelper<AnyModelType>();
@@ -202,7 +213,7 @@ const useColumns = ({
       .filter(
         (field) =>
           field.type !== 'manyRelation' &&
-          !['password', 'id', 'referenceCode'].includes(field.key.toLowerCase())
+          !['password', 'id', 'referencecode'].includes(field.key.toLowerCase())
       )
       .map((field) => {
         if (modelName === 'userUniversities' && field.key === 'userId') {
@@ -341,7 +352,7 @@ const useColumns = ({
 
     baseColumns.push(...fieldColumns);
 
-    if (modelName !== 'userUniversities') {
+    if (!['userUniversities', 'users', 'university'].includes(modelName)) {
       baseColumns.push(
         columnHelper.accessor('id', {
           id: `${modelName}-actions`,
@@ -410,6 +421,32 @@ const AdminModelPageContent: FC = () => {
   const [selectedPledgeOpportunity, setSelectedPledgeOpportunity] =
     useState<DbPledgeOpportunity>();
 
+  const buildFilters = (): {
+    search?: string | undefined;
+    role?: string | undefined;
+    isSuperAdmin?: boolean | undefined;
+  } => {
+    const filters: {
+      search?: string;
+      role?: string;
+      isSuperAdmin?: boolean;
+    } = {};
+
+    if (searchParams.search) {
+      filters.search = searchParams.search;
+    }
+
+    if (modelName === 'userUniversities') {
+      filters.role = 'alumni';
+    }
+
+    if (modelName === 'users') {
+      filters.isSuperAdmin = true;
+    }
+
+    return filters;
+  };
+
   const params = {
     model: modelName,
     enabled: !!model,
@@ -417,16 +454,7 @@ const AdminModelPageContent: FC = () => {
       pageIndex: searchParams.pagination.pageIndex,
       pageSize: searchParams.pagination.pageSize,
     },
-    ...(modelName === 'userUniversities' && {
-      filters: {
-        role: 'alumni',
-      },
-    }),
-    ...(modelName === 'users' && {
-      filters: {
-        isSuperAdmin: true,
-      },
-    }),
+    filters: buildFilters(),
   };
 
   const { data, error, isLoading, refetch } = useGetRecords(params);
@@ -474,6 +502,31 @@ const AdminModelPageContent: FC = () => {
     'globalFeatureFlags',
     'userUniversities',
     'pledgeOpportunities',
+    'users',
+  ];
+
+  const getSearchPlaceholder = (): string => {
+    switch (modelName) {
+      case 'users':
+      case 'userUniversities':
+        return t('Search by name or email');
+      case 'university':
+        return t('Search by ID or name');
+      case 'pledgeOpportunities':
+        return t('Search by ID or email');
+      case 'givingOpportunities':
+        return t('Search by ID, university name or name');
+      default:
+        return t('Search...');
+    }
+  };
+
+  const globalFilterDefs: DataTableGlobalFilter[] = [
+    {
+      type: 'search',
+      id: 'search',
+      placeholder: getSearchPlaceholder(),
+    },
   ];
 
   const commonComponent = (
@@ -510,6 +563,8 @@ const AdminModelPageContent: FC = () => {
           loading={isLoading}
           pagination={searchParams.pagination}
           pageCount={pageCount}
+          globalFiltersDefs={globalFilterDefs}
+          globalFilter={{ search: searchParams.search }}
         />
       )}
 

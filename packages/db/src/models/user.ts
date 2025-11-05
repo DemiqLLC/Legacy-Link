@@ -34,8 +34,11 @@ import type { DbWhere, ManyRelations } from './base';
 import { DbModel } from './base';
 import type { DbModelKeys } from './db';
 
-export type UserDbWhere = DbWhere &
-  MemberFiltersType & { isSuperAdmin?: boolean };
+export type UserDbWhere = Omit<DbWhere & MemberFiltersType, 'id'> & {
+  id?: string | string[];
+  isSuperAdmin?: boolean;
+  createdAt?: { gte?: Date };
+};
 
 export type Metrics = {
   date: string;
@@ -131,8 +134,13 @@ export class DbUserModel extends DbModel<
       );
     }
 
-    if (where.id) {
-      conditions.push(eq(usersTable.id, where.id.trim()));
+    const { id } = where;
+    if (id != null) {
+      if (Array.isArray(id) && id.length > 0) {
+        conditions.push(inArray(usersTable.id, id));
+      } else if (typeof id === 'string' && id.trim() !== '') {
+        conditions.push(eq(usersTable.id, id.trim()));
+      }
     }
 
     if (where.name) {
@@ -387,5 +395,51 @@ export class DbUserModel extends DbModel<
     }
 
     return data as DbUser;
+  }
+
+  public async findAllUsers(opts?: {
+    filters?: {
+      search?: string;
+      isSuperAdmin?: boolean;
+    };
+    pagination?: { pageIndex?: number; pageSize?: number };
+  }): Promise<{ items: DbUser[]; total: number }> {
+    const conditions: (SQL | undefined)[] = [];
+
+    if (opts?.filters?.isSuperAdmin) {
+      conditions.push(eq(this.dbTable.isSuperAdmin, opts.filters.isSuperAdmin));
+    }
+
+    if (opts?.filters?.search) {
+      const search = `%${opts.filters.search}%`;
+      conditions.push(
+        or(ilike(this.dbTable.name, search), ilike(this.dbTable.email, search))
+      );
+    }
+
+    const pageSize = opts?.pagination?.pageSize ?? 10;
+    const pageIndex = opts?.pagination?.pageIndex ?? 0;
+
+    const whereCondition =
+      conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [items, totalResult] = await Promise.all([
+      this.client
+        .select()
+        .from(this.dbTable)
+        .where(whereCondition)
+        .limit(pageSize)
+        .offset(pageIndex * pageSize)
+        .execute(),
+      this.client
+        .select({ count: sql<number>`count(*)` })
+        .from(this.dbTable)
+        .where(whereCondition)
+        .execute(),
+    ]);
+
+    const total = Number(totalResult[0]?.count ?? 0);
+
+    return { items, total };
   }
 }

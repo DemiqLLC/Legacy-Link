@@ -134,6 +134,13 @@
       "when": 1761579703882,
       "tag": "0018_add-the-isActive-property-to-the-GivingOpportunities-model",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1761938489714,
+      "tag": "0019_add_legacy_link_foundation_code_to_university",
+      "breakpoints": true
     }
   ]
 }

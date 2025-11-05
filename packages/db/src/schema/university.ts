@@ -10,6 +10,7 @@ export const university = pgTable('university', {
   name: varchar({ length: 256 }).notNull(),
   referenceCode: varchar({ length: 50 }).notNull().unique(),
   universityAbbreviation: varchar({ length: 10 }).notNull().unique(),
+  legacyLinkFoundationCode: varchar({ length: 20 }).notNull().unique(),
 });
 
 export type DbUniversity = typeof university.$inferSelect;

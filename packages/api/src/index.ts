@@ -9,6 +9,7 @@ import 'express-async-errors';
 import { getServerSession } from '@meltstudio/auth';
 import { Db } from '@meltstudio/db';
 import { logger } from '@meltstudio/logger';
+import { UserRoleEnum } from '@meltstudio/types';
 import * as Sentry from '@sentry/node';
 import express from 'express';
 import QueryString from 'qs';
@@ -16,6 +17,7 @@ import QueryString from 'qs';
 import { config } from './config';
 import { ctx } from './context';
 import { adminRouter } from './routers/admin';
+import { alumniRouter } from './routers/alumni';
 import { chatAssistantRouter } from './routers/chat-assistant';
 import { apiDef } from './routers/def';
 import { featureFlagsRouter } from './routers/feature-flags';
@@ -74,10 +76,13 @@ app.use(async (req, res, next) => {
     });
   }
 
+  const userRole = user.isSuperAdmin ? UserRoleEnum.SUPER_ADMIN : undefined;
+
   req.auth = {
     user: {
       id: user.id,
       email: user.email,
+      role: userRole,
     },
   };
 
@@ -113,6 +118,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/storage', storageRouter);
 app.use('/api/feature-flags', featureFlagsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/alumni', alumniRouter);
 app.use('/api/university-profile', universityProfileRouter);
 app.use('/api/metrics', metricsRouter);
 app.use('/api/integrations', integrationsRouter);

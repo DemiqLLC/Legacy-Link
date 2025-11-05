@@ -58,7 +58,7 @@ userUniversitiesRouter.put('/legacy-ring', async (req, res) => {
     ringLevel as LegacyRingLevelEnum
   );
 
-  await db.user.handleAlgoliaSaveByPk(userId);
+  await db.userUniversities.handleAlgoliaSaveByPk(userId);
 
   return res.status(200).json({ success: true });
 });

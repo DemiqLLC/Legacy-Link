@@ -41,7 +41,7 @@ shopifyRouter.post('/:universityId/customer/create', async (req, res) => {
 
     return res.status(200).json({ customer: customerResponse });
   } catch (error) {
-    logger.error('Error creating customer:', error);
+    logger.error(error, 'Error creating customer:');
 
     return res.status(500).json({
       error: 'Error creating customer in Shopify',

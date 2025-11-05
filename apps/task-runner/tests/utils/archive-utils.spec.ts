@@ -6,7 +6,12 @@ import { createZipArchive } from '@/task-runner/utils/archive-utils';
 
 // Mock the external dependencies
 jest.mock('archiver');
-jest.mock('@/task-runner/logger');
+jest.mock('@/task-runner/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}));
 
 describe('createZipArchive', () => {
   // Define types for the event callbacks

@@ -1,7 +1,33 @@
+import { PledgeStatusEnum } from '@meltstudio/types';
 import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 import { apiCommonErrorSchema } from '@/api/routers/def-utils';
+
+const trendSchema = z.object({
+  date: z.string(),
+  count: z.number(),
+});
+
+const rankingSchema = z.object({
+  id: z.string(),
+  name: z.string().nullable(),
+  count: z.number(),
+});
+
+const pledgeFunnelSchema = z.record(z.nativeEnum(PledgeStatusEnum), z.number());
+
+export const superAdminDashboardStatsSchema = z.object({
+  onboardedUniversities: z.number(),
+  alumniGrowthTrend: z.array(trendSchema),
+  totalPledges: z.number(),
+  monetaryPledges: z.number(),
+  nonMonetaryPledges: z.number(),
+  pledgeFunnel: pledgeFunnelSchema,
+  topUniversities: z.array(rankingSchema),
+  topAlumni: z.array(rankingSchema),
+  pendingFollowUps: z.number(),
+});
 
 const relationSchema = z.object({
   id: z.string(),
@@ -22,6 +48,31 @@ const recordSchema = z.object({
 
 export const adminApiDef = makeApi([
   {
+    alias: 'getSuperAdminDashboard',
+    description: 'Fetch global metrics for the Super Admin dashboard',
+    method: 'get',
+    path: '/dashboard-metrics',
+    status: 200,
+    response: superAdminDashboardStatsSchema,
+    errors: [
+      {
+        status: 401,
+        description: 'Unauthorized',
+        schema: apiCommonErrorSchema,
+      },
+      {
+        status: 400,
+        description: 'Error fetching data',
+        schema: apiCommonErrorSchema,
+      },
+      {
+        status: 500,
+        description: 'Error fetching data from database',
+        schema: apiCommonErrorSchema,
+      },
+    ],
+  },
+  {
     alias: 'getRecords',
     description: 'Get records for a model',
     method: 'get',
@@ -29,14 +80,30 @@ export const adminApiDef = makeApi([
     parameters: [
       { name: 'model', type: 'Path', schema: z.string() },
       {
-        name: 'pagination',
         type: 'Query',
-        schema: z.string().optional(),
-      },
-      {
-        name: 'filters',
-        type: 'Query',
-        schema: z.string().optional(),
+        description: '',
+        name: 'query',
+        schema: z
+          .object({
+            pagination: z
+              .object({
+                pageIndex: z
+                  .union([z.string(), z.number().nonnegative()])
+                  .optional(),
+                pageSize: z
+                  .union([z.string(), z.number().nonnegative()])
+                  .optional(),
+              })
+              .optional(),
+            filters: z
+              .object({
+                search: z.string().optional(),
+                role: z.string().optional(),
+                isSuperAdmin: z.coerce.boolean().optional(),
+              })
+              .optional(),
+          })
+          .nullish(),
       },
     ],
     response: z.object({

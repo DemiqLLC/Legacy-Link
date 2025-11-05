@@ -1,89 +1,308 @@
 import type { DbModelMap } from '@meltstudio/db/src/models/db';
+import { logger } from '@meltstudio/logger';
 import { hashPassword } from '@meltstudio/server-common';
 import type { RowEmbeddingData } from '@meltstudio/types';
+import { PledgeStatusEnum, UserRoleEnum } from '@meltstudio/types';
 import { insertModelSchemas } from '@meltstudio/zod-schemas';
 import { z } from 'zod';
 
 import { ctx } from '@/api/context';
 import { db } from '@/api/db';
-import type { DbModel } from '@/db/models';
 import type { DbGivingOpportunities, DbUniversity } from '@/db/schema';
+import { generateDatesFrom28DaysAgo } from '@/db/utils/date-utils';
 
 import { adminApiDef } from './def';
 
+type UserCount = {
+  id: string;
+  name: string | null;
+  count: number;
+};
+
+async function getOnboardedUniversityCount(): Promise<number> {
+  return db.university.count();
+}
+
+async function getAlumniGrowthTrend(): Promise<
+  { date: string; count: number }[]
+> {
+  const recentUsers = await db.user.findMany({
+    args: {
+      where: {
+        createdAt: {
+          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        },
+      },
+    },
+  });
+
+  return generateDatesFrom28DaysAgo().map((date) => ({
+    date,
+    count: recentUsers.filter(
+      (u) => new Date(u.createdAt).toISOString().split('T')[0] === date
+    ).length,
+  }));
+}
+
+async function processTopUniversities(
+  universityMap: Record<string, number>
+): Promise<UserCount[]> {
+  const universityIdsToFetch = Object.keys(universityMap);
+  if (universityIdsToFetch.length === 0) return [];
+
+  const fetchedUniversities = await db.university.findMany({
+    args: { where: { id: universityIdsToFetch } },
+  });
+
+  const fetchedUniversityMap = new Map(
+    fetchedUniversities.map((u) => [u.id, u.name])
+  );
+
+  const universitiesWithCounts = Object.entries(universityMap).map(
+    ([id, count]) => ({
+      id,
+      name: fetchedUniversityMap.get(id) ?? null,
+      count,
+    })
+  );
+
+  return universitiesWithCounts.sort((a, b) => b.count - a.count).slice(0, 5);
+}
+
+async function processTopAlumni(
+  userMap: Record<string, number>
+): Promise<UserCount[]> {
+  const userIdsToFetch = Object.keys(userMap);
+  if (userIdsToFetch.length === 0) return [];
+
+  const fetchedUsers = await db.user.findMany({
+    args: { where: { id: userIdsToFetch } },
+  });
+
+  const fetchedUserMap = new Map(fetchedUsers.map((u) => [u.id, u.name]));
+
+  const usersWithCounts: UserCount[] = Object.entries(userMap).map(
+    ([id, count]) => ({
+      id,
+      name: fetchedUserMap.get(id) ?? null,
+      count,
+    })
+  );
+
+  return usersWithCounts.sort((a, b) => b.count - a.count).slice(0, 5);
+}
+
+async function getDashboardPledgeMetrics(): Promise<{
+  totalPledges: number;
+  monetaryPledges: number;
+  nonMonetaryPledges: number;
+  pledgeFunnel: Record<string, number>;
+  topUniversities: UserCount[];
+  topAlumni: UserCount[];
+  pendingFollowUps: number;
+}> {
+  const pledges = await db.pledgeOpportunities.findMany({});
+
+  const universityMap: Record<string, number> = {};
+  const userMap: Record<string, number> = {};
+  const pledgeFunnel: Record<string, number> = {};
+  Object.values(PledgeStatusEnum).forEach((status) => {
+    pledgeFunnel[status] = 0;
+  });
+
+  let monetaryPledges = 0;
+  let nonMonetaryPledges = 0;
+  let pendingFollowUps = 0;
+
+  pledges.forEach((pledge) => {
+    const status = pledge.status as PledgeStatusEnum;
+
+    if (pledge.pledgeType === 'monetary_support') {
+      monetaryPledges += 1;
+    } else {
+      nonMonetaryPledges += 1;
+    }
+
+    if (pledgeFunnel[status] !== undefined) {
+      pledgeFunnel[status] += 1;
+    }
+
+    if (pledge.universityId) {
+      universityMap[pledge.universityId] =
+        (universityMap[pledge.universityId] || 0) + 1;
+    }
+
+    if (pledge.userId) {
+      userMap[pledge.userId] = (userMap[pledge.userId] || 0) + 1;
+    }
+
+    if (
+      status !== PledgeStatusEnum.COMPLETED &&
+      status !== PledgeStatusEnum.IMPACT_RECORDED
+    ) {
+      pendingFollowUps += 1;
+    }
+  });
+
+  const [topUniversities, topAlumni] = await Promise.all([
+    processTopUniversities(universityMap),
+    processTopAlumni(userMap),
+  ]);
+
+  return {
+    totalPledges: pledges.length,
+    monetaryPledges,
+    nonMonetaryPledges,
+    pledgeFunnel,
+    topUniversities,
+    topAlumni,
+    pendingFollowUps,
+  };
+}
+
 export const adminRouter = ctx.router(adminApiDef);
 
-const paginationSchema = z.object({
-  pageIndex: z.number().optional(),
-  pageSize: z.number().optional(),
+adminRouter.get('/dashboard-metrics', async (req, res) => {
+  const authUser = req.auth?.user as
+    | { id: string; email: string; role?: UserRoleEnum }
+    | undefined;
+
+  if (!authUser || authUser.role !== UserRoleEnum.SUPER_ADMIN) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const [onboardedUniversities, alumniGrowthTrend, pledgeMetrics] =
+      await Promise.all([
+        getOnboardedUniversityCount(),
+        getAlumniGrowthTrend(),
+        getDashboardPledgeMetrics(),
+      ]);
+
+    const dashboardMetrics = {
+      onboardedUniversities,
+      alumniGrowthTrend,
+      ...pledgeMetrics,
+    };
+
+    return res.status(200).json(dashboardMetrics);
+  } catch (error) {
+    logger.error(error, 'Error fetching dashboard metrics:');
+    return res
+      .status(500)
+      .json({ error: 'Error fetching data from PostgreSQL' });
+  }
 });
 
 adminRouter.get('/:model', async (req, res) => {
   const modelName = req.params.model as keyof DbModelMap;
-  // check if the model exists
+
   if (!(modelName in db.models)) {
     return res.status(404).json({ error: 'Model not found' });
   }
 
-  const modelDb = db.getModel(modelName);
-
-  type DbModelWhere =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    typeof modelDb extends DbModel<any, infer W, any> ? W : never;
-
   const model = db.getModel(modelName);
-  if (model) {
-    let pageIndex = 0;
-    let pageSize = 10;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    let whereFilters: DbModelWhere | undefined;
 
-    if (req.query.pagination && typeof req.query.pagination === 'string') {
-      const parsed = paginationSchema.safeParse(
-        JSON.parse(req.query.pagination)
-      );
-      if (parsed.success) {
-        pageIndex = parsed.data.pageIndex ?? 0;
-        pageSize = parsed.data.pageSize ?? 10;
-      }
-    }
+  if (!model) {
+    return res.status(404).json({ error: 'Model not found' });
+  }
 
-    if (req.query.filters && typeof req.query.filters === 'string') {
-      try {
-        whereFilters = JSON.parse(req.query.filters) as DbModelWhere;
-      } catch (error) {
-        return res.status(400).json({ error: 'Invalid filters format' });
-      }
-    }
+  const { query: queryFilters } = req.query;
 
-    const offset = pageIndex * pageSize;
+  const filters = queryFilters?.filters || {};
+  const pagination = queryFilters?.pagination || {};
 
-    const [paginatedRecords, total] = await Promise.all([
-      model.findMany({
-        args: {
-          where: whereFilters,
-          pagination: {
-            offset,
-            limit: pageSize,
+  const pageIndex = Number(pagination?.pageIndex) || 0;
+  const pageSize = Number(pagination?.pageSize) || 10;
+
+  try {
+    let items: unknown[] = [];
+    let total = 0;
+
+    switch (modelName) {
+      case 'users': {
+        const usersResult = await db.user.findAllUsers({
+          filters: {
+            search: filters.search,
+            isSuperAdmin: filters.isSuperAdmin,
           },
-        },
-      }),
-      model.count(whereFilters),
-    ]);
+          pagination: { pageIndex, pageSize },
+        });
+        items = usersResult.items;
+        total = usersResult.total;
+        break;
+      }
+
+      case 'university': {
+        const universityResult = await db.university.findAllUniversities({
+          filters: {
+            search: filters.search,
+          },
+          pagination: { pageIndex, pageSize },
+        });
+        items = universityResult.items;
+        total = universityResult.total;
+        break;
+      }
+
+      case 'givingOpportunities': {
+        const givingOppsResult =
+          await db.givingOpportunities.findAllGivingOpportunities({
+            filters: {
+              search: filters.search,
+            },
+            pagination: { pageIndex, pageSize },
+          });
+        items = givingOppsResult.items;
+        total = givingOppsResult.total;
+        break;
+      }
+
+      case 'userUniversities': {
+        const userUniResult = await db.userUniversities.findAllUserUniversities(
+          {
+            filters: {
+              search: filters.search,
+              role: filters.role,
+            },
+            pagination: { pageIndex, pageSize },
+          }
+        );
+        items = userUniResult.items;
+        total = userUniResult.total;
+        break;
+      }
+
+      case 'pledgeOpportunities': {
+        const pledgeResult =
+          await db.pledgeOpportunities.findAllPledgeOpportunities({
+            filters: {
+              search: filters.search,
+            },
+            pagination: { pageIndex, pageSize },
+          });
+        items = pledgeResult.items;
+        total = pledgeResult.total;
+        break;
+      }
+
+      default:
+        return res.status(400).json({ error: 'Unsupported model' });
+    }
 
     const pageCount = Math.ceil(total / pageSize);
 
     return res.status(200).json({
-      items: paginatedRecords,
+      items,
       total,
       limit: pageSize,
-      offset,
+      offset: pageIndex * pageSize,
       pageCount,
       currentPage: pageIndex,
     });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
   }
-
-  return res.status(404).json({ error: 'Model not found' });
 });
 
 adminRouter.get('/:model/:id', async (req, res) => {
@@ -336,6 +555,40 @@ adminRouter.post('/:model', async (req, res) => {
 
         (data as DbUniversity).referenceCode =
           `LL-${universityAbbreviation}-001`;
+
+        const allUniversities = await db.university.findMany({});
+
+        let nextCodeNumber = 1;
+
+        if (allUniversities.length > 0) {
+          const codeNumbers = allUniversities
+            .map((u) => {
+              const match =
+                u.legacyLinkFoundationCode.match(/^LL-LEGACY-(\d{3})$/);
+
+              if (!match || !match[1]) {
+                return 0;
+              }
+              return parseInt(match[1], 10);
+            })
+            .filter((num) => num > 0);
+
+          if (codeNumbers.length > 0) {
+            const maxCodeNumber = Math.max(...codeNumbers);
+            nextCodeNumber = maxCodeNumber + 1;
+
+            if (nextCodeNumber > 999) {
+              return res.status(400).json({
+                error:
+                  'Legacy Link Foundation Code has reached maximum value (999)',
+              });
+            }
+          }
+        }
+
+        const legacyLinkCode = `LL-LEGACY-${String(nextCodeNumber).padStart(3, '0')}`;
+        (data as DbUniversity).legacyLinkFoundationCode = legacyLinkCode;
+
         req.body.data = data;
       }
 

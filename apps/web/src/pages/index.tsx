@@ -4,6 +4,7 @@ import { Trans } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { Loading } from '@/components/common/loading';
+import { AlumniDashboard } from '@/components/metrics';
 import { useSessionUser } from '@/components/user/user-context';
 import type { NextPageWithLayout } from '@/types/next';
 
@@ -22,6 +23,7 @@ const HomePage: NextPageWithLayout = () => {
       {/* <div>
         <MetricsDashboard />
       </div> */}
+      <AlumniDashboard />
     </div>
   );
 };
@@ -31,7 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (context.locale != null) {
     const translations = await serverSideTranslations(context.locale);
-
     props = { ...props, ...translations };
   }
 

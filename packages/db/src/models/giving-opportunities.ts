@@ -1,4 +1,5 @@
-import { eq, getTableColumns } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { and, eq, getTableColumns, ilike, inArray, or, sql } from 'drizzle-orm';
 import type { PgSelect } from 'drizzle-orm/pg-core';
 
 import type { DbModelKeys } from '@/db/models/db';
@@ -13,6 +14,7 @@ import { DbModel } from './base';
 
 export type GivingOpportunitiesDbWhere = DbWhere & {
   universityId?: string;
+  id?: string | string[];
 };
 
 export class DbGivingOpportunitiesModel extends DbModel<
@@ -77,7 +79,13 @@ export class DbGivingOpportunitiesModel extends DbModel<
         eq(this.dbTable.universityId, where.universityId)
       );
     }
-
+    if (where.id != null) {
+      if (Array.isArray(where.id)) {
+        filtered = filtered.where(inArray(this.dbTable.id, where.id));
+      } else {
+        filtered = filtered.where(eq(this.dbTable.id, where.id));
+      }
+    }
     return filtered;
   }
 
@@ -114,5 +122,61 @@ export class DbGivingOpportunitiesModel extends DbModel<
       .execute();
 
     return data;
+  }
+
+  public async findAllGivingOpportunities(opts?: {
+    filters?: {
+      search?: string;
+    };
+    pagination?: { pageIndex?: number; pageSize?: number };
+  }): Promise<{ items: DbGivingOpportunities[]; total: number }> {
+    const conditions: (SQL | undefined)[] = [];
+
+    if (opts?.filters?.search) {
+      const search = `%${opts.filters.search}%`;
+      conditions.push(
+        or(
+          ilike(this.dbTable.name, search),
+          ilike(this.dbTable.referenceCode, search),
+          ilike(university.name, search)
+        )
+      );
+    }
+
+    const pageSize = opts?.pagination?.pageSize ?? 10;
+    const pageIndex = opts?.pagination?.pageIndex ?? 0;
+
+    const whereCondition =
+      conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [items, totalResult] = await Promise.all([
+      this.client
+        .select({
+          id: this.dbTable.id,
+          name: this.dbTable.name,
+          isActive: this.dbTable.isActive,
+          createdAt: this.dbTable.createdAt,
+          description: this.dbTable.description,
+          referenceCode: this.dbTable.referenceCode,
+          universityId: this.dbTable.universityId,
+          goalAmount: this.dbTable.goalAmount,
+        })
+        .from(this.dbTable)
+        .innerJoin(university, eq(this.dbTable.universityId, university.id))
+        .where(whereCondition)
+        .limit(pageSize)
+        .offset(pageIndex * pageSize)
+        .execute(),
+      this.client
+        .select({ count: sql<number>`count(*)` })
+        .from(this.dbTable)
+        .innerJoin(university, eq(this.dbTable.universityId, university.id))
+        .where(whereCondition)
+        .execute(),
+    ]);
+
+    const total = Number(totalResult[0]?.count ?? 0);
+
+    return { items, total };
   }
 }

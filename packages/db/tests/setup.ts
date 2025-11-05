@@ -123,6 +123,7 @@ const usersModelMock = {
   getUniversityMembers: jest.fn(),
   findManyWithUserUniversities: jest.fn(),
   findById: jest.fn(),
+  findAllUsers: jest.fn(),
 };
 
 const passwordRecoveryTokensModelMock = {
@@ -163,6 +164,7 @@ const universitiesModelMock = {
     DbUniversityWhere
   >(),
   findById: jest.fn(),
+  findAllUniversities: jest.fn(),
 };
 
 const userUniversitiesModelMock = {
@@ -175,6 +177,7 @@ const userUniversitiesModelMock = {
   findManyByUserIdAndUniversityId: jest.fn(),
   updateRoleMultipleUsersInUniversity: jest.fn(),
   updateRingLevelForUserInUniversity: jest.fn(),
+  findAllUserUniversities: jest.fn(),
 };
 
 const memberInvitationsModelMock = {
@@ -276,6 +279,7 @@ const givingOpportunitiesModelMock = {
   >(),
   findById: jest.fn(),
   findByUniversityId: jest.fn(),
+  findAllGivingOpportunities: jest.fn(),
 };
 
 const userProfileModelMock = {
@@ -295,6 +299,7 @@ const pledgeOpportunitiesModelMock = {
   >(),
   findById: jest.fn(),
   findByGivingOpportunityId: jest.fn(),
+  findAllPledgeOpportunities: jest.fn(),
 };
 
 const DBMock = jest.fn<MockedDb, void[]>().mockImplementation(() => ({

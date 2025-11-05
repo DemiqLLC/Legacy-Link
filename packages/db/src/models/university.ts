@@ -1,4 +1,5 @@
-import { eq, ilike } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { and, eq, ilike, inArray, or, sql } from 'drizzle-orm';
 import type { PgSelect } from 'drizzle-orm/pg-core';
 
 import type { DbUniversity } from '@/db/schema';
@@ -14,6 +15,7 @@ import type { DbModelKeys } from './db';
 
 export type DbUniversityWhere = {
   name?: string;
+  id?: string | string[];
 };
 
 export class DbUniversityModel extends DbModel<
@@ -91,6 +93,13 @@ export class DbUniversityModel extends DbModel<
     if (where.name != null) {
       filtered = filtered.where(ilike(this.dbTable.name, where.name));
     }
+    if (where.id != null) {
+      if (Array.isArray(where.id)) {
+        filtered = filtered.where(inArray(this.dbTable.id, where.id));
+      } else {
+        filtered = filtered.where(eq(this.dbTable.id, where.id));
+      }
+    }
 
     return filtered;
   }
@@ -116,8 +125,53 @@ export class DbUniversityModel extends DbModel<
       referenceCode: data?.university.referenceCode,
       universityAbbreviation: data?.university.universityAbbreviation,
       description: data?.university_profile.description,
+      legacyLinkFoundationCode: data?.university.legacyLinkFoundationCode,
     };
 
     return result || null;
+  }
+
+  public async findAllUniversities(opts?: {
+    filters?: {
+      search?: string;
+    };
+    pagination?: { pageIndex?: number; pageSize?: number };
+  }): Promise<{ items: DbUniversity[]; total: number }> {
+    const conditions: (SQL | undefined)[] = [];
+
+    if (opts?.filters?.search) {
+      const search = `%${opts.filters.search}%`;
+      conditions.push(
+        or(
+          ilike(this.dbTable.name, search),
+          ilike(this.dbTable.referenceCode, search)
+        )
+      );
+    }
+
+    const pageSize = opts?.pagination?.pageSize ?? 10;
+    const pageIndex = opts?.pagination?.pageIndex ?? 0;
+
+    const whereCondition =
+      conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [items, totalResult] = await Promise.all([
+      this.client
+        .select()
+        .from(this.dbTable)
+        .where(whereCondition)
+        .limit(pageSize)
+        .offset(pageIndex * pageSize)
+        .execute(),
+      this.client
+        .select({ count: sql<number>`count(*)` })
+        .from(this.dbTable)
+        .where(whereCondition)
+        .execute(),
+    ]);
+
+    const total = Number(totalResult[0]?.count ?? 0);
+
+    return { items, total };
   }
 }

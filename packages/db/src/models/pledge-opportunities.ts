@@ -1,4 +1,5 @@
-import { eq, getTableColumns } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { and, eq, getTableColumns, ilike, or, sql } from 'drizzle-orm';
 import type { PgSelect } from 'drizzle-orm/pg-core';
 
 import type { DbModelKeys } from '@/db/models/db';
@@ -15,6 +16,9 @@ export type PledgeOpportunitiesDbWhere = DbWhere & {
   universityId?: string;
   userId?: string;
   givingOpportunityId?: string;
+  orderBy?: Partial<
+    Record<keyof typeof pledgeOpportunitiesTable, 'asc' | 'desc'>
+  >;
 };
 
 export class DbPledgeOpportunitiesModel extends DbModel<
@@ -88,6 +92,24 @@ export class DbPledgeOpportunitiesModel extends DbModel<
       );
     }
 
+    if (where.orderBy) {
+      const entries = Object.entries(where.orderBy) as [
+        keyof typeof this.dbTable,
+        'asc' | 'desc',
+      ][];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [column, direction] of entries) {
+        const columnRef = this.dbTable[column];
+        if (columnRef) {
+          filtered = filtered.orderBy(
+            direction === 'desc'
+              ? sql`${columnRef} DESC`
+              : sql`${columnRef} ASC`
+          );
+        }
+      }
+    }
+
     return filtered;
   }
 
@@ -124,5 +146,48 @@ export class DbPledgeOpportunitiesModel extends DbModel<
       .execute();
 
     return data;
+  }
+
+  public async findAllPledgeOpportunities(opts?: {
+    filters?: {
+      search?: string;
+    };
+    pagination?: { pageIndex?: number; pageSize?: number };
+  }): Promise<{ items: DbPledgeOpportunity[]; total: number }> {
+    const conditions: (SQL | undefined)[] = [];
+
+    if (opts?.filters?.search) {
+      const search = `%${opts.filters.search}%`;
+      conditions.push(
+        or(
+          ilike(this.dbTable.email, search),
+          ilike(this.dbTable.referenceCode, search)
+        )
+      );
+    }
+
+    const pageSize = opts?.pagination?.pageSize ?? 10;
+    const pageIndex = opts?.pagination?.pageIndex ?? 0;
+
+    const whereCondition =
+      conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [items, totalResult] = await Promise.all([
+      this.client
+        .select()
+        .from(this.dbTable)
+        .where(whereCondition)
+        .limit(pageSize)
+        .offset(pageIndex * pageSize)
+        .execute(),
+      this.client
+        .select({ count: sql<number>`count(*)` })
+        .from(this.dbTable)
+        .execute(),
+    ]);
+
+    const total = Number(totalResult[0]?.count ?? 0);
+
+    return { items, total };
   }
 }

@@ -15,23 +15,37 @@ import {
   friendlyAuthErrorMessages,
   TwoFactorProvider,
 } from '@meltstudio/types';
+import axios from 'axios';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { getServerSession } from 'next-auth';
 import type { ClientSafeProvider, SignInOptions } from 'next-auth/react';
-import { getProviders, signIn } from 'next-auth/react';
+import { getProviders, signIn, useSession } from 'next-auth/react';
 import { Trans, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useSessionUser } from '@/components/user/user-context';
 import { useClientConfig } from '@/config/client';
 import { AuthLayout } from '@/layouts/auth-layout';
 import type { NextPageWithLayout } from '@/types/next';
 import { Typography } from '@/ui/typography';
+
+type NextAuthSession = {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    selectedUniversity?: {
+      id: string;
+      name: string;
+      role: string;
+    };
+    isSuperAdmin?: boolean;
+  };
+};
 
 const searchParamsSchema = z.object({
   callbackUrl: z.string().nonempty().optional().catch(undefined),
@@ -54,7 +68,6 @@ const SignInPage: NextPageWithLayout<ServerSideProps> = (props) => {
   const { providers } = props;
 
   const router = useRouter();
-  const { refetch } = useSessionUser();
   const searchParams = searchParamsSchema.parse(router.query);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -68,7 +81,7 @@ const SignInPage: NextPageWithLayout<ServerSideProps> = (props) => {
   const [totpCode, setTotpCode] = useState<string>('');
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const clientConfig = useClientConfig();
-
+  const { update: updateSession } = useSession();
   const credentialsProvider = providers.find(
     (provider) => provider.id === 'credentials'
   );
@@ -124,8 +137,26 @@ const SignInPage: NextPageWithLayout<ServerSideProps> = (props) => {
     }
 
     if (result.ok) {
-      await refetch();
-      await router.push(result.url ? `${result.url}` : `${prefix}/`);
+      // TODO: Session management should be improved depending on the role
+      try {
+        await updateSession();
+        await new Promise((resolve) => {
+          setTimeout(resolve, 300);
+        });
+
+        const { data: sessionData } =
+          await axios.get<NextAuthSession>('/api/auth/session');
+
+        const isSuperAdmin = sessionData.user?.isSuperAdmin === true;
+
+        if (isSuperAdmin) {
+          await router.push(`${prefix}/super-admin`);
+        } else {
+          await router.push(result.url ? `${result.url}` : `${prefix}/`);
+        }
+      } catch (error) {
+        await router.push(result.url ? `${result.url}` : `${prefix}/`);
+      }
     } else if (result.error === AuthErrorCode.SecondFactorRequired) {
       setShowOTP(true);
     } else {

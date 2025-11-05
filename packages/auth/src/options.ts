@@ -29,6 +29,7 @@ export const authOptions = {
         user: {
           ...session.user,
           selectedUniversity: token.selectedUniversity,
+          isSuperAdmin: token.isSuperAdmin,
         },
       };
     },
@@ -63,17 +64,24 @@ export const authOptions = {
               email: user.email,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               role: session.user.selectedUniversity.role,
+              isSuperAdmin: user.isSuperAdmin,
             };
           }
         }
+
         if (trigger === 'signIn') {
           // add the first university to the token
           const universities = user?.universities || [];
+          const baseToken = {
+            ...token,
+            isSuperAdmin: user?.isSuperAdmin,
+          };
+
           if (universities.length > 0) {
             const selectedUniversity = universities[0]?.university;
             if (selectedUniversity) {
               return {
-                ...token,
+                ...baseToken,
                 selectedUniversity: {
                   id: selectedUniversity.id,
                   name: selectedUniversity.name,
@@ -82,11 +90,19 @@ export const authOptions = {
               };
             }
           }
+
+          return baseToken;
         }
+
         if (user) {
-          return { ...token, role: user.universities[0]?.role };
+          return {
+            ...token,
+            role: user.universities[0]?.role,
+            isSuperAdmin: user.isSuperAdmin,
+          };
         }
       }
+
       return token;
     },
   },

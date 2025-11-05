@@ -20,7 +20,11 @@ export function useGetRecords<T extends AnyModelType>({
     pageIndex?: number;
     pageSize?: number;
   };
-  filters?: Record<string, unknown>;
+  filters?: {
+    search?: string;
+    role?: string;
+    isSuperAdmin?: boolean;
+  };
 }): UseQueryResult<
   | {
       items: T[];
@@ -43,8 +47,10 @@ export function useGetRecords<T extends AnyModelType>({
             model,
           },
           queries: {
-            pagination: pagination ? JSON.stringify(pagination) : undefined,
-            filters: filters ? JSON.stringify(filters) : undefined,
+            query: {
+              pagination,
+              filters,
+            },
           },
         });
 
@@ -196,4 +202,14 @@ export function useGetModelRelations({
       enabled: !!relation,
     })),
   });
+}
+
+export type SuperAdminDashboardData = ZodiosResponseByAlias<
+  ZodApi,
+  'getSuperAdminDashboard'
+>;
+export function useSuperAdminDashboard(): UseQueryResult<
+  SuperAdminDashboardData | undefined
+> {
+  return apiHooks.useGetSuperAdminDashboard(undefined);
 }

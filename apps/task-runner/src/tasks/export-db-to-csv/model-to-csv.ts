@@ -22,7 +22,7 @@ export const modelToCSV: TaskFunction = async (data) => {
   // Parse input
   const parsedData = ModelToCSVDataSchema.safeParse(data);
   if (!parsedData.success) {
-    logger.error('modelName or email are not valid', parsedData.error);
+    logger.error(parsedData.error, 'modelName or email are not valid');
     return { error: parsedData.error.message };
   }
 

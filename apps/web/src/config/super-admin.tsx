@@ -377,6 +377,13 @@ const adminNav = Object.entries(modelsConfig)
     icon: StackIcon,
   }));
 
+const dashboardNav = {
+  id: 'dashboard',
+  title: <Trans>Dashboard</Trans>,
+  href: '/super-admin',
+  icon: StackIcon,
+};
+
 export const useNavAdmin = (): {
   title: string;
   href: string;
@@ -412,6 +419,7 @@ export const useNavAdmin = (): {
 export const navAdmin = [{ title: 'Admin', href: '/super-admin/wizard' }];
 
 export const sidebarNavAdmin = [
+  dashboardNav,
   // ...wizardsNav,
   ...adminNav,
   // ...GoogleTagManagerNav,

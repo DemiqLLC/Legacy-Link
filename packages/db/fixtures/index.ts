@@ -88,12 +88,13 @@ async function createFixtures(): Promise<void> {
   const universities = await wrapWithSpinner('university', async () => {
     const universitiesToCreate = Array(3)
       .fill(0)
-      .map(() => ({
+      .map((_, index) => ({
         id: faker.string.uuid(),
         createdAt: faker.date.past().toDateString(),
         name: `University ${faker.company.name()}`,
         universityAbbreviation: faker.string.alphanumeric(5).toUpperCase(),
         referenceCode: `LL-${faker.string.alphanumeric(3).toUpperCase()}-${faker.number.int({ min: 1, max: 999 })}`,
+        legacyLinkFoundationCode: `LL-LEGACY-${String(index + 1).padStart(3, '0')}`,
       }));
 
     universitiesToCreate.push({
@@ -102,6 +103,7 @@ async function createFixtures(): Promise<void> {
       name: universityName,
       universityAbbreviation: faker.string.alphanumeric(5).toUpperCase(),
       referenceCode: `LL-${faker.string.alphanumeric(3).toUpperCase()}-${faker.number.int({ min: 1, max: 999 })}`,
+      legacyLinkFoundationCode: `LL-LEGACY-004`,
     });
 
     await db.insert(university).values(universitiesToCreate);

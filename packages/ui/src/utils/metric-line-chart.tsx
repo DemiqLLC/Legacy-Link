@@ -14,7 +14,7 @@ import {
 type MetricLineChartProps = {
   data: {
     date: string;
-    counts: number;
+    count: number;
   }[];
   xAxisLabel: string;
   yAxisLabel: string;
@@ -31,7 +31,7 @@ export const MetricLineChart: React.FC<MetricLineChartProps> = ({
     backgroundColor: theme === 'dark' ? '#000' : '#fff',
     color: theme === 'dark' ? '#fff' : '#000',
   };
-  const dataMax = Math.max(...(data.map((item) => item.counts) || [0]));
+  const dataMax = Math.max(...(data.map((item) => item.count) || [0]));
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -45,7 +45,7 @@ export const MetricLineChart: React.FC<MetricLineChartProps> = ({
         />
         <Tooltip contentStyle={tooltipStyle} />
         <Legend />
-        <Line type="monotone" dataKey="counts" name={yAxisLabel} />
+        <Line type="monotone" dataKey="count" name={yAxisLabel} />
       </LineChart>
     </ResponsiveContainer>
   );

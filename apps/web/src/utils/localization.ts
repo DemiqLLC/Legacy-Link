@@ -396,3 +396,6 @@ export function getLocalizedLegacyRingLevel(
 
   return map[value] ?? value;
 }
+
+export const formatNumber = (num: number): string =>
+  (num ?? 0).toLocaleString('en-US');

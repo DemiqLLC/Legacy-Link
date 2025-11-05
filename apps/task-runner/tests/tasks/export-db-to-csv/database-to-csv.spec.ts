@@ -69,8 +69,8 @@ describe('databaseToCSV', () => {
 
     expect(result.error).toBeDefined();
     expect(logger.error).toHaveBeenCalledWith(
-      'No valid email was given',
-      expect.anything()
+      expect.anything(),
+      'No valid email was given'
     );
   });
 

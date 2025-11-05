@@ -19,7 +19,7 @@ export const databaseToCSV: TaskFunction = async (data) => {
   // Parse input
   const parsedData = DatabaseToCSVDataSchema.safeParse(data);
   if (!parsedData.success) {
-    logger.error('No valid email was given', parsedData.error);
+    logger.error(parsedData.error, 'No valid email was given');
     return { error: parsedData.error.message };
   }
   const { email } = parsedData.data;

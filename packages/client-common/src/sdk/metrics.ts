@@ -11,3 +11,13 @@ export function useFetchMetrics(
 ): UseQueryResult<Metric | undefined> {
   return apiHooks.useFetchMetrics(body);
 }
+
+export type AlumniDashboardData = ZodiosResponseByAlias<
+  ZodApi,
+  'getAlumniDashboard'
+>;
+export function useAlumniDashboard(): UseQueryResult<
+  AlumniDashboardData | undefined
+> {
+  return apiHooks.useGetAlumniDashboard(undefined);
+}

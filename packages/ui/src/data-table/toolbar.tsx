@@ -1,12 +1,6 @@
 'use client';
 
-import { useSearchParams } from '@meltstudio/core';
-import { Button } from '@meltstudio/theme';
-import { Cross2Icon } from '@radix-ui/react-icons';
 import type { Table } from '@tanstack/react-table';
-import { useRouter } from 'next/router';
-import { Trans } from 'next-i18next';
-import type { MouseEventHandler } from 'react';
 
 import { DataTableDateRangeFilter } from './filters/date-range';
 import { DataTableSearchFilter } from './filters/search';
@@ -31,24 +25,8 @@ export const DataTableToolbar = <TData,>(
     actionButton,
   } = props;
 
-  // TODO: find a way to use hooks both from next/navigation and next/router
-  const router = useRouter();
-  const { pathname } = router;
-  const searchParams = useSearchParams();
-
   const hasFilters =
     globalFiltersDefs.length > 0 || columnFiltersDefs.length > 0;
-  // TODO: this will probably need improvements if the page has search params
-  // not related to the table
-  const isFiltered = searchParams != null && searchParams.toString() !== '';
-
-  const handleResetClick: MouseEventHandler<HTMLButtonElement> = async () => {
-    if (pathname == null) {
-      return;
-    }
-
-    await router.push(pathname);
-  };
 
   return (
     <div className="flex w-full items-center justify-between">
@@ -115,17 +93,6 @@ export const DataTableToolbar = <TData,>(
               // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
               throw new Error(`Unknown filter type: ${filter.type}`);
             })}
-
-            {isFiltered && (
-              <Button
-                variant="ghost"
-                onClick={handleResetClick}
-                className="h-8 px-2 lg:px-3"
-              >
-                <Trans>Reset</Trans>
-                <Cross2Icon className="ml-2 size-4" />
-              </Button>
-            )}
           </>
         )}
       </div>

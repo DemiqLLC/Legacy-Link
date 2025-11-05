@@ -6,7 +6,12 @@ import { TaskRunner } from '@/task-runner/runner';
 import { TaskRunnerClient } from '@/tasks/client';
 
 jest.mock('@/tasks/client');
-jest.mock('@/task-runner/logger');
+jest.mock('@/task-runner/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}));
 jest.mock('@/task-runner/runner');
 
 describe('CLI runner', () => {

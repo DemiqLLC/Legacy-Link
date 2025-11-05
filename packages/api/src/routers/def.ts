@@ -1,6 +1,7 @@
 import { mergeApis } from '@zodios/core';
 
 import { adminApiDef } from './admin/def';
+import { alumniApiDef } from './alumni/def';
 import { featureFlagsApi } from './feature-flags/def';
 import { givingOpportunitiesApiDef } from './giving-opportunities/def';
 import { historicTableApiDef } from './historic-table/def';
@@ -25,6 +26,7 @@ const zodiosApiDef = mergeApis({
   '/storage': storageApiDef,
   '/feature-flags': featureFlagsApi,
   '/admin': adminApiDef,
+  '/alumni': alumniApiDef,
   '/university-profile': universityProfileApiDef,
   '/metrics': metricsApiDef,
   '/integrations/shopify': shopifyApiDef,

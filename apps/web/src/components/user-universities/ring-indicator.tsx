@@ -10,15 +10,15 @@ export const RingIndicator: FC<RingIndicatorProps> = ({ ringLevel }) => {
   const getRingColor = (level: LegacyRingLevelEnum | null): string => {
     switch (level) {
       case LegacyRingLevelEnum.RING_ONE_BUILDER:
-        return 'border-gray-400';
+        return 'border-[#D97706] bg-[#F59E0B]';
       case LegacyRingLevelEnum.RING_TWO_ADVOCATE:
-        return 'border-blue-500';
+        return 'border-[#9CA3AF] bg-[#E5E7EB]';
       case LegacyRingLevelEnum.RING_THREE_LEADER:
-        return 'border-purple-500';
+        return 'border-[#FBBF24] bg-[#FACC15]';
       case LegacyRingLevelEnum.RING_FOUR_VISIONARY:
-        return 'border-orange-500';
+        return 'border-[#A5F3FC] bg-[#E0F2FE]';
       case LegacyRingLevelEnum.RING_FIVE_LEGACY:
-        return 'border-yellow-400';
+        return 'border-[#111827] bg-[#374151]';
       default:
         return '';
     }
@@ -44,7 +44,7 @@ export const RingIndicator: FC<RingIndicatorProps> = ({ ringLevel }) => {
   return (
     <div className="group relative inline-block">
       <div
-        className={`size-4 rounded-full border-[3px] bg-white ${getRingColor(ringLevel)} cursor-help transition-all hover:scale-110 dark:bg-black`}
+        className={`size-4 rounded-full border-[3px] ${getRingColor(ringLevel)} cursor-help transition-all hover:scale-110`}
       />
       <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-gray-700">
         {getRingLabel(ringLevel)}
