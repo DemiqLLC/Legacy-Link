@@ -19,6 +19,7 @@ const pledgeFunnelSchema = z.record(z.nativeEnum(PledgeStatusEnum), z.number());
 
 export const superAdminDashboardStatsSchema = z.object({
   onboardedUniversities: z.number(),
+  totalAlumni: z.number(),
   alumniGrowthTrend: z.array(trendSchema),
   totalPledges: z.number(),
   monetaryPledges: z.number(),

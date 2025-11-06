@@ -23,15 +23,48 @@ async function getOnboardedUniversityCount(): Promise<number> {
   return db.university.count();
 }
 
+async function getTotalAlumniCount(): Promise<number> {
+  const alumniRelations = await db.userUniversities.findMany({
+    args: {
+      where: { role: UserRoleEnum.ALUMNI },
+    },
+  });
+
+  const alumniUserIds = alumniRelations.map((r) => r.userId);
+  if (!alumniUserIds.length) return 0;
+
+  const totalAlumni = await db.user.count({
+    id: alumniUserIds,
+    isSuperAdmin: false,
+  });
+
+  return totalAlumni;
+}
+
 async function getAlumniGrowthTrend(): Promise<
   { date: string; count: number }[]
 > {
+  const alumniRelations = await db.userUniversities.findMany({
+    args: {
+      where: { role: UserRoleEnum.ALUMNI },
+    },
+  });
+
+  const alumniUserIds = alumniRelations.map((r) => r.userId);
+  if (!alumniUserIds.length) {
+    return generateDatesFrom28DaysAgo().map((date) => ({
+      date,
+      count: 0,
+    }));
+  }
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const recentUsers = await db.user.findMany({
     args: {
       where: {
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        },
+        id: alumniUserIds,
+        isSuperAdmin: false,
+        createdAt: { gte: thirtyDaysAgo },
       },
     },
   });
@@ -172,15 +205,21 @@ adminRouter.get('/dashboard-metrics', async (req, res) => {
   }
 
   try {
-    const [onboardedUniversities, alumniGrowthTrend, pledgeMetrics] =
-      await Promise.all([
-        getOnboardedUniversityCount(),
-        getAlumniGrowthTrend(),
-        getDashboardPledgeMetrics(),
-      ]);
+    const [
+      onboardedUniversities,
+      totalAlumni,
+      alumniGrowthTrend,
+      pledgeMetrics,
+    ] = await Promise.all([
+      getOnboardedUniversityCount(),
+      getTotalAlumniCount(),
+      getAlumniGrowthTrend(),
+      getDashboardPledgeMetrics(),
+    ]);
 
     const dashboardMetrics = {
       onboardedUniversities,
+      totalAlumni,
       alumniGrowthTrend,
       ...pledgeMetrics,
     };

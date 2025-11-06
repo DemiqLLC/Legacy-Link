@@ -78,9 +78,7 @@ const SuperAdminDashboardPage: NextPageWithLayout = () => {
         />
         <Card
           title={t('Total Alumni')}
-          value={formatNumber(
-            metrics.alumniGrowthTrend.reduce((sum, item) => sum + item.count, 0)
-          )}
+          value={formatNumber(metrics.totalAlumni)}
           icon={<Users className="text-green-500" />}
           color="rgba(34, 197, 94, 0.1)"
         />
