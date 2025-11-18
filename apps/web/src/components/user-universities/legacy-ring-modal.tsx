@@ -1,5 +1,5 @@
 import { Trans, useTranslation } from 'next-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 import { useUpdateLegacyRing } from '@/client-common/sdk';
@@ -54,7 +54,7 @@ export const LegacyRingModal: React.FC<LegacyRingModalProps> = ({
     notes: z.string().optional(),
   });
 
-  const { formComponent } = useFormHelper(
+  const { formComponent, form } = useFormHelper(
     {
       schema: legacyRingSchema,
       fields: [
@@ -69,29 +69,33 @@ export const LegacyRingModal: React.FC<LegacyRingModalProps> = ({
       isLoading: justSubmitted,
       onSubmit: (values): void => {
         setJustSubmitted(true);
-        try {
-          updateLegacyRing.mutate({
+        updateLegacyRing.mutate(
+          {
             userId,
             universityId,
             ringLevel: values.legacyRing,
-          });
-
-          toast({
-            title: t('Success'),
-            description: t('Legacy Ring added successfully'),
-            variant: 'default',
-          });
-
-          onOpenChange(false);
-          setJustSubmitted(false);
-        } catch (error) {
-          toast({
-            title: t('Error'),
-            description: t('An error occurred while adding Legacy Ring'),
-            variant: 'destructive',
-          });
-          setJustSubmitted(false);
-        }
+          },
+          {
+            onSuccess: () => {
+              toast({
+                title: t('Success'),
+                description: t('Legacy Ring added successfully'),
+                variant: 'default',
+              });
+              form.reset();
+              onOpenChange(false);
+              setJustSubmitted(false);
+            },
+            onError: () => {
+              toast({
+                title: t('Error'),
+                description: t('An error occurred while adding Legacy Ring'),
+                variant: 'destructive',
+              });
+              setJustSubmitted(false);
+            },
+          }
+        );
       },
     },
     {
@@ -101,6 +105,15 @@ export const LegacyRingModal: React.FC<LegacyRingModalProps> = ({
       },
     }
   );
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        legacyRing: '',
+        notes: '',
+      });
+    }
+  }, [open, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

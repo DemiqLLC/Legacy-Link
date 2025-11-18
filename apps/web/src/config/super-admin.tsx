@@ -187,7 +187,7 @@ export const modelsConfig: ModelConfig = {
   },
   userUniversities: {
     name: 'userUniversities',
-    displayName: <Trans>Alumnis</Trans>,
+    displayName: <Trans>Alumni</Trans>,
     indexName: AlgoliaIndex.USER_UNIVERSITIES,
     url: 'user-universities',
     fields: [

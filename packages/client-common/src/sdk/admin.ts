@@ -94,20 +94,24 @@ export function useGetRecord(
   id: string
 ): UseQueryResult<AnyModelType | undefined, Error> {
   const schema = getModelSchema(model);
-  return useQuery(['getRecord', model, id], async () => {
-    if (model) {
-      // Fetch data from API
-      const response = await apiClient.getRecord({ params: { model, id } });
-      // Validate the response using the selected schema
-      const result = schema.safeParse(response);
+  return useQuery(
+    ['getRecord', model, id],
+    async () => {
+      if (model && id) {
+        const response = await apiClient.getRecord({ params: { model, id } });
+        const result = schema.safeParse(response);
 
-      if (result.success) {
-        return result.data;
+        if (result.success) {
+          return result.data;
+        }
+        throw new Error('Invalid record format');
       }
-      throw new Error('Invalid record format');
+      return undefined;
+    },
+    {
+      enabled: !!model && !!id,
     }
-    return [];
-  });
+  );
 }
 
 export function useUpdateRecord(

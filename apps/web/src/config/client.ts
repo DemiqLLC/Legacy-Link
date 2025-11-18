@@ -42,7 +42,7 @@ export const useClientConfig = () => {
         icon: LaptopIcon,
       },
       {
-        title: t('Alumnis'),
+        title: t('Alumni'),
         href: '/alumnis',
         icon: PersonIcon,
       },
