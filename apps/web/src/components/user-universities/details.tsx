@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 
@@ -44,19 +45,33 @@ export const UserUniversityDetails: React.FC<UserUniversityDetailsProps> = ({
   const { t } = useTranslation();
   const { user } = useSessionUser();
   const [isLegacyRingModalOpen, setIsLegacyRingModalOpen] = useState(false);
+  const { data: userUniversitiesData } = useQuery({
+    queryKey: [
+      'userUniversities',
+      userUniversities?.userId,
+      userUniversities?.universityId,
+    ],
+    queryFn: () => userUniversities,
+    enabled: !!userUniversities,
+    initialData: userUniversities,
+  });
+
+  const currentUserUniversities = userUniversitiesData ?? userUniversities;
 
   const { data: userData } = useGetRecord(
     'users',
-    userUniversities?.userId
-  ) as { data: DbUser };
+    currentUserUniversities?.userId || ''
+  ) as {
+    data: DbUser;
+  };
 
   const { data: universityData } = useGetRecord(
     'university',
-    userUniversities?.universityId
+    currentUserUniversities?.universityId || ''
   ) as { data: DbUniversity };
 
   const { data: userProfileData } = useGetUserProfileByUserId({
-    userId: userUniversities?.userId,
+    userId: currentUserUniversities?.userId,
   }) as unknown as { data: DbUserProfile };
 
   return (
@@ -97,21 +112,24 @@ export const UserUniversityDetails: React.FC<UserUniversityDetailsProps> = ({
               label={t('University')}
               value={universityData?.name}
             />
-            <FieldDisplay label={t('Role')} value={userUniversities?.role} />
+            <FieldDisplay
+              label={t('Role')}
+              value={currentUserUniversities?.role}
+            />
             <FieldDisplay
               label={t('Legacy Ring')}
               value={
-                userUniversities?.ringLevel ? (
+                currentUserUniversities?.ringLevel ? (
                   <div className="flex items-center gap-2">
                     <span>
                       {getLocalizedLegacyRingLevel(
                         t,
-                        userUniversities.ringLevel
+                        currentUserUniversities.ringLevel
                       )}
                     </span>
                     <RingIndicator
                       ringLevel={
-                        userUniversities.ringLevel as LegacyRingLevelEnum
+                        currentUserUniversities.ringLevel as LegacyRingLevelEnum
                       }
                     />
                   </div>
@@ -375,8 +393,8 @@ export const UserUniversityDetails: React.FC<UserUniversityDetailsProps> = ({
       <LegacyRingModal
         open={isLegacyRingModalOpen}
         onOpenChange={setIsLegacyRingModalOpen}
-        userId={userUniversities?.userId}
-        universityId={userUniversities?.universityId}
+        userId={currentUserUniversities?.userId}
+        universityId={currentUserUniversities?.universityId}
         userName={userData?.name}
       />
     </>
