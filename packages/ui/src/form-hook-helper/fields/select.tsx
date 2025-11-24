@@ -53,7 +53,12 @@ export const SelectInputHelper = <TFieldValues extends FieldValues>({
                 />
               </SelectTrigger>
             </FormControl>
-            <SelectContent className="max-h-[300px]" showScrollButtons>
+            <SelectContent
+              className="max-h-[300px]"
+              showScrollButtons
+              position="popper"
+              align="start"
+            >
               {fieldData.options?.map(
                 ({ label: optionLabel, value: optionValue, isDisabled }) => (
                   <SelectItem

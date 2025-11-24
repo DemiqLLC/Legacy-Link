@@ -67,4 +67,5 @@ export type FieldData<TFieldValues extends FieldValues = FieldValues> = {
   enableCrop?: boolean;
   required?: boolean;
   disabled?: boolean;
+  className?: string;
 };

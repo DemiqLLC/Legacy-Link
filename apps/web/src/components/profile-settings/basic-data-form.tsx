@@ -269,6 +269,7 @@ export const BasicDataForm: React.FC<BasicDataFormProps> = ({
             'Share your thoughts about the legacy you want to create...'
           ),
           size: 'full',
+          className: 'min-h-[150px]',
         },
         {
           name: 'importantCauses',

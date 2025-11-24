@@ -41,8 +41,12 @@
           "name": "chat_universityId_university_id_fk",
           "tableFrom": "chat",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -50,8 +54,12 @@
           "name": "chat_userId_users_id_fk",
           "tableFrom": "chat",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -134,8 +142,12 @@
           "name": "embeddings_universityId_university_id_fk",
           "tableFrom": "embeddings",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -145,7 +157,10 @@
         "embeddings_tableName_rowId_unique": {
           "name": "embeddings_tableName_rowId_unique",
           "nullsNotDistinct": false,
-          "columns": ["tableName", "rowId"]
+          "columns": [
+            "tableName",
+            "rowId"
+          ]
         }
       },
       "policies": {},
@@ -209,8 +224,12 @@
           "name": "feature_flag_universityId_university_id_fk",
           "tableFrom": "feature_flag",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -218,8 +237,12 @@
           "name": "feature_flag_globalFeatureFlagId_global_feature_flags_id_fk",
           "tableFrom": "feature_flag",
           "tableTo": "global_feature_flags",
-          "columnsFrom": ["globalFeatureFlagId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "globalFeatureFlagId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -229,7 +252,10 @@
         "feature_flag_universityId_globalFeatureFlagId_unique": {
           "name": "feature_flag_universityId_globalFeatureFlagId_unique",
           "nullsNotDistinct": false,
-          "columns": ["universityId", "globalFeatureFlagId"]
+          "columns": [
+            "universityId",
+            "globalFeatureFlagId"
+          ]
         }
       },
       "policies": {},
@@ -298,8 +324,12 @@
           "name": "giving_opportunities_universityId_university_id_fk",
           "tableFrom": "giving_opportunities",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -309,7 +339,9 @@
         "giving_opportunities_referenceCode_unique": {
           "name": "giving_opportunities_referenceCode_unique",
           "nullsNotDistinct": false,
-          "columns": ["referenceCode"]
+          "columns": [
+            "referenceCode"
+          ]
         }
       },
       "policies": {},
@@ -369,7 +401,9 @@
         "global_feature_flags_flag_unique": {
           "name": "global_feature_flags_flag_unique",
           "nullsNotDistinct": false,
-          "columns": ["flag"]
+          "columns": [
+            "flag"
+          ]
         }
       },
       "policies": {},
@@ -420,8 +454,12 @@
           "name": "integration_universityId_university_id_fk",
           "tableFrom": "integration",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -431,7 +469,10 @@
         "integration_platform_universityId_unique": {
           "name": "integration_platform_universityId_unique",
           "nullsNotDistinct": false,
-          "columns": ["platform", "universityId"]
+          "columns": [
+            "platform",
+            "universityId"
+          ]
         }
       },
       "policies": {},
@@ -489,8 +530,12 @@
           "name": "integration_key_integrationId_integration_id_fk",
           "tableFrom": "integration_key",
           "tableTo": "integration",
-          "columnsFrom": ["integrationId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "integrationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -500,7 +545,10 @@
         "integration_key_name_integrationId_unique": {
           "name": "integration_key_name_integrationId_unique",
           "nullsNotDistinct": false,
-          "columns": ["name", "integrationId"]
+          "columns": [
+            "name",
+            "integrationId"
+          ]
         }
       },
       "policies": {},
@@ -570,8 +618,12 @@
           "name": "member_invitations_userId_users_id_fk",
           "tableFrom": "member_invitations",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -579,8 +631,12 @@
           "name": "member_invitations_universityId_university_id_fk",
           "tableFrom": "member_invitations",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -590,12 +646,17 @@
         "member_invitations_token_unique": {
           "name": "member_invitations_token_unique",
           "nullsNotDistinct": false,
-          "columns": ["token"]
+          "columns": [
+            "token"
+          ]
         },
         "unique_email_university": {
           "name": "unique_email_university",
           "nullsNotDistinct": false,
-          "columns": ["email", "universityId"]
+          "columns": [
+            "email",
+            "universityId"
+          ]
         }
       },
       "policies": {},
@@ -658,8 +719,12 @@
           "name": "message_chatId_chat_id_fk",
           "tableFrom": "message",
           "tableTo": "chat",
-          "columnsFrom": ["chatId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -667,8 +732,12 @@
           "name": "message_userId_users_id_fk",
           "tableFrom": "message",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -729,8 +798,12 @@
           "name": "password_recovery_tokens_user_id_users_id_fk",
           "tableFrom": "password_recovery_tokens",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -831,8 +904,12 @@
           "name": "pledge_opportunities_userId_users_id_fk",
           "tableFrom": "pledge_opportunities",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -840,8 +917,12 @@
           "name": "pledge_opportunities_universityId_university_id_fk",
           "tableFrom": "pledge_opportunities",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -849,8 +930,12 @@
           "name": "pledge_opportunities_givingOpportunityId_giving_opportunities_id_fk",
           "tableFrom": "pledge_opportunities",
           "tableTo": "giving_opportunities",
-          "columnsFrom": ["givingOpportunityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "givingOpportunityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -860,7 +945,9 @@
         "pledge_opportunities_referenceCode_unique": {
           "name": "pledge_opportunities_referenceCode_unique",
           "nullsNotDistinct": false,
-          "columns": ["referenceCode"]
+          "columns": [
+            "referenceCode"
+          ]
         }
       },
       "policies": {},
@@ -1000,8 +1087,12 @@
           "name": "tables_history_userId_users_id_fk",
           "tableFrom": "tables_history",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1009,8 +1100,12 @@
           "name": "tables_history_universityId_university_id_fk",
           "tableFrom": "tables_history",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1065,12 +1160,16 @@
         "university_referenceCode_unique": {
           "name": "university_referenceCode_unique",
           "nullsNotDistinct": false,
-          "columns": ["referenceCode"]
+          "columns": [
+            "referenceCode"
+          ]
         },
         "university_universityAbbreviation_unique": {
           "name": "university_universityAbbreviation_unique",
           "nullsNotDistinct": false,
-          "columns": ["universityAbbreviation"]
+          "columns": [
+            "universityAbbreviation"
+          ]
         }
       },
       "policies": {},
@@ -1130,8 +1229,12 @@
           "name": "university_profile_university_id_university_id_fk",
           "tableFrom": "university_profile",
           "tableTo": "university",
-          "columnsFrom": ["university_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "university_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1139,7 +1242,9 @@
       "compositePrimaryKeys": {
         "university_profile_university_id_pk": {
           "name": "university_profile_university_id_pk",
-          "columns": ["university_id"]
+          "columns": [
+            "university_id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -1176,8 +1281,12 @@
           "name": "user_feature_flags_userId_users_id_fk",
           "tableFrom": "user_feature_flags",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1185,8 +1294,12 @@
           "name": "user_feature_flags_featureFlagId_feature_flag_id_fk",
           "tableFrom": "user_feature_flags",
           "tableTo": "feature_flag",
-          "columnsFrom": ["featureFlagId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "featureFlagId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1194,7 +1307,10 @@
       "compositePrimaryKeys": {
         "user_feature_flags_userId_featureFlagId_pk": {
           "name": "user_feature_flags_userId_featureFlagId_pk",
-          "columns": ["userId", "featureFlagId"]
+          "columns": [
+            "userId",
+            "featureFlagId"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -1426,8 +1542,12 @@
           "name": "user_profile_userId_users_id_fk",
           "tableFrom": "user_profile",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1476,8 +1596,12 @@
           "name": "user_universities_userId_users_id_fk",
           "tableFrom": "user_universities",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1485,8 +1609,12 @@
           "name": "user_universities_universityId_university_id_fk",
           "tableFrom": "user_universities",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1494,7 +1622,10 @@
       "compositePrimaryKeys": {
         "user_universities_userId_universityId_pk": {
           "name": "user_universities_userId_universityId_pk",
-          "columns": ["userId", "universityId"]
+          "columns": [
+            "userId",
+            "universityId"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -1585,7 +1716,9 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       },
       "policies": {},
@@ -1680,8 +1813,12 @@
           "name": "webhook-events_universityId_university_id_fk",
           "tableFrom": "webhook-events",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1689,8 +1826,12 @@
           "name": "webhook-events_webhookId_webhooks_id_fk",
           "tableFrom": "webhook-events",
           "tableTo": "webhooks",
-          "columnsFrom": ["webhookId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "webhookId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1751,8 +1892,12 @@
           "name": "webhooks_universityId_university_id_fk",
           "tableFrom": "webhooks",
           "tableTo": "university",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "universityId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1768,7 +1913,13 @@
     "public.platform": {
       "name": "platform",
       "schema": "public",
-      "values": ["zapier", "shopify", "stripe", "mercado-pago", "woocommerce"]
+      "values": [
+        "zapier",
+        "shopify",
+        "stripe",
+        "mercado-pago",
+        "woocommerce"
+      ]
     },
     "public.keyName": {
       "name": "keyName",
@@ -1792,12 +1943,18 @@
     "public.direction": {
       "name": "direction",
       "schema": "public",
-      "values": ["inbound", "outgoing"]
+      "values": [
+        "inbound",
+        "outgoing"
+      ]
     },
     "public.communication_method": {
       "name": "communication_method",
       "schema": "public",
-      "values": ["email", "phone"]
+      "values": [
+        "email",
+        "phone"
+      ]
     },
     "public.pledge_status": {
       "name": "pledge_status",
@@ -1823,12 +1980,22 @@
     "public.report_status": {
       "name": "report_status",
       "schema": "public",
-      "values": ["pending", "done"]
+      "values": [
+        "pending",
+        "done"
+      ]
     },
     "public.table_actions": {
       "name": "table_actions",
       "schema": "public",
-      "values": ["create", "update", "delete", "enable", "disable", "invite"]
+      "values": [
+        "create",
+        "update",
+        "delete",
+        "enable",
+        "disable",
+        "invite"
+      ]
     },
     "public.employment_status": {
       "name": "employment_status",
@@ -1845,7 +2012,13 @@
     "public.gender_identity": {
       "name": "gender_identity",
       "schema": "public",
-      "values": ["male", "female", "non_binary", "prefer_not_say", "other"]
+      "values": [
+        "male",
+        "female",
+        "non_binary",
+        "prefer_not_say",
+        "other"
+      ]
     },
     "public.income_range": {
       "name": "income_range",
@@ -1878,7 +2051,11 @@
     "public.interested_in_fund": {
       "name": "interested_in_fund",
       "schema": "public",
-      "values": ["yes", "maybe", "not_now"]
+      "values": [
+        "yes",
+        "maybe",
+        "not_now"
+      ]
     },
     "public.relationship_status": {
       "name": "relationship_status",
@@ -1906,7 +2083,11 @@
     "public.role": {
       "name": "role",
       "schema": "public",
-      "values": ["admin", "alumni", "super_admin"]
+      "values": [
+        "admin",
+        "alumni",
+        "super_admin"
+      ]
     },
     "public.event_table_name": {
       "name": "event_table_name",
@@ -1926,12 +2107,25 @@
     "public.event_type": {
       "name": "event_type",
       "schema": "public",
-      "values": ["create", "update", "delete", "enable", "disable", "invite"]
+      "values": [
+        "create",
+        "update",
+        "delete",
+        "enable",
+        "disable",
+        "invite"
+      ]
     },
     "public.status": {
       "name": "status",
       "schema": "public",
-      "values": ["success", "failure", "pending", "error", "not_found"]
+      "values": [
+        "success",
+        "failure",
+        "pending",
+        "error",
+        "not_found"
+      ]
     }
   },
   "schemas": {},
