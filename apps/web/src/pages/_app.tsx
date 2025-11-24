@@ -91,7 +91,7 @@ const AppWithAuth = (props: AppPropsWithLayout): JSX.Element => {
     pageProps: { session },
   } = props;
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <SessionProvider session={session}>
         <AppWithI18n {...props} />
       </SessionProvider>

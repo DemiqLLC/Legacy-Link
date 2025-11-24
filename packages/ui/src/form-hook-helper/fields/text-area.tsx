@@ -35,7 +35,11 @@ export const TextAreaHelper = <TFieldValues extends FieldValues>({
             {fieldData.label} {fieldData.required && ' *'}
           </FormLabel>
           <FormControl>
-            <Textarea {...field} placeholder={fieldData.placeholder} />
+            <Textarea
+              {...field}
+              placeholder={fieldData.placeholder}
+              className={fieldData.className}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
