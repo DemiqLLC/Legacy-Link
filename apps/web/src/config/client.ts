@@ -155,7 +155,7 @@ export const useClientConfig = () => {
     },
     app: {
       logo: CookieIcon,
-      name: 'Legacy Link',
+      name: 'Legacy Links',
     },
     nav: {
       items: [

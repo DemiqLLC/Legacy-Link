@@ -155,14 +155,19 @@ export class DbUniversityModel extends DbModel<
     const whereCondition =
       conditions.length > 0 ? and(...conditions) : undefined;
 
+    const baseQuery = this.client
+      .select()
+      .from(this.dbTable)
+      .where(whereCondition)
+      .orderBy(this.dbTable.name);
+
+    const itemsQuery =
+      pageSize !== 0
+        ? baseQuery.limit(pageSize).offset(pageIndex * pageSize)
+        : baseQuery;
+
     const [items, totalResult] = await Promise.all([
-      this.client
-        .select()
-        .from(this.dbTable)
-        .where(whereCondition)
-        .limit(pageSize)
-        .offset(pageIndex * pageSize)
-        .execute(),
+      itemsQuery.execute(),
       this.client
         .select({ count: sql<number>`count(*)` })
         .from(this.dbTable)

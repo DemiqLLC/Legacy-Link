@@ -33,7 +33,7 @@ pledgeOpportunitiesRouter.post('/', async (req, res) => {
 
     if (!userProfile || !userProfile.legacyLinkId) {
       return res.status(400).json({
-        error: 'User profile or legacy link ID not found',
+        error: 'User profile or legacy links ID not found',
       });
     }
 

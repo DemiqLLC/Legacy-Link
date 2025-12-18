@@ -149,7 +149,7 @@ export const UserUniversityDetails: React.FC<UserUniversityDetailsProps> = ({
           {userProfileData && typeof userProfileData === 'object' ? (
             <div className="grid grid-cols-2 gap-4 text-sm">
               <FieldDisplay
-                label={t('Legacy Link ID')}
+                label={t('Legacy Links ID')}
                 value={userProfileData.legacyLinkId ?? '-'}
               />
               <FieldDisplay

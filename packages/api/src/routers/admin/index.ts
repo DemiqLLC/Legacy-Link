@@ -212,8 +212,8 @@ adminRouter.get('/:model', async (req, res) => {
   const filters = queryFilters?.filters || {};
   const pagination = queryFilters?.pagination || {};
 
-  const pageIndex = Number(pagination?.pageIndex) || 0;
-  const pageSize = Number(pagination?.pageSize) || 10;
+  const pageIndex = Number(pagination?.pageIndex ?? 0);
+  const pageSize = Number(pagination?.pageSize ?? 10);
 
   try {
     let items: unknown[] = [];
@@ -290,13 +290,15 @@ adminRouter.get('/:model', async (req, res) => {
         return res.status(400).json({ error: 'Unsupported model' });
     }
 
-    const pageCount = Math.ceil(total / pageSize);
+    const pageCount = pageSize === 0 ? 1 : Math.ceil(total / pageSize);
+    const limit = pageSize === 0 ? total : pageSize;
+    const offset = pageSize === 0 ? 0 : pageIndex * pageSize;
 
     return res.status(200).json({
       items,
       total,
-      limit: pageSize,
-      offset: pageIndex * pageSize,
+      limit,
+      offset,
       pageCount,
       currentPage: pageIndex,
     });
@@ -580,7 +582,7 @@ adminRouter.post('/:model', async (req, res) => {
             if (nextCodeNumber > 999) {
               return res.status(400).json({
                 error:
-                  'Legacy Link Foundation Code has reached maximum value (999)',
+                  'Legacy Links Foundation Code has reached maximum value (999)',
               });
             }
           }

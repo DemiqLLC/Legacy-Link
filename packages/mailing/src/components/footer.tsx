@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
                 margin: '0',
               }}
             >
-              © {new Date().getFullYear()} Legacy Link. All rights reserved.
+              © {new Date().getFullYear()} Legacy Links. All rights reserved.
             </Text>
           </Column>
         </Section>
