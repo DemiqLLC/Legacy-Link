@@ -30,7 +30,12 @@ const SignUpPageAlumni: NextPageWithLayout = () => {
   const { t } = useTranslation();
   const params = useSearchParams();
   const token = params.get('token') || '';
-  const { data: dataUniversity } = useGetRecords({ model: 'university' });
+  const { data: dataUniversity } = useGetRecords({
+    model: 'university',
+    pagination: {
+      pageSize: 0,
+    },
+  });
 
   const BasicAccountSchema = z
     .object({
